@@ -1,0 +1,33 @@
+---
+layout: post
+title: for demo
+tags: learning, github
+---
+
+h1. Just to learn
+
+As you know, we'd like to program.
+
+bq. Nice Post.
+
+# For the title
+# List 2
+# List 3
+
+And the code look like: @ruby, or shell@
+
+Show you an image:
+!{{site.url}}/assets/images/demo.jpg(Hello)!
+
+Just to write some code, _algorithm_!
+
+{% highlight ruby linenos %}
+
+def show
+    @messsage = "GoGoGo"
+    puts @message
+end
+
+{% endhighlight %}
+
+

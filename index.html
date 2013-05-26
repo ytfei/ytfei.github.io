@@ -1,1 +1,43 @@
-I'm building a GitHub Pages project....
+---
+layout: default
+title: Hello World
+categories: demo
+tags: demo
+---
+<!-- This loops through the paginated posts -->
+{% for post in paginator.posts %}
+  <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
+  <p class="author">
+    <span class="date">{{ post.date }}</span>
+  </p>
+  <!--
+  <div class="content">
+    {{ post.content }}
+  </div>
+  -->
+{% endfor %}
+
+<!-- Pagination links -->
+<div>
+<ul class="pager">
+    <li class="previous">
+      {% if paginator.previous_page %}
+        <a href="/page{{ paginator.previous_page }}">Prev</a>
+      {% else %}
+        <a href="#">Prev</a>
+      {% endif %}
+    </li>
+    
+    <!-- 
+      <span class="page_number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
+    -->
+
+    <li class="next">
+      {% if paginator.next_page %}
+        <a href="/page{{ paginator.next_page }}">Next</a>
+      {% else %}
+        <a href="#">Next</a>
+      {% endif %}
+    </li>
+</ul>
+</div>
