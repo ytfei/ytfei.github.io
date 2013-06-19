@@ -1,0 +1,6 @@
+---
+layout: post
+title: Begin to write
+---
+
+Here is the first baby step. :)
