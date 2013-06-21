@@ -4,15 +4,15 @@ title: CodingME!
 ---
 <!-- This loops through the paginated posts -->
 {% for post in paginator.posts %}
-  <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
+  <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
   <p class="author">
     <span class="date">{{ post.date }}</span>
   </p>
   <!--
+  -->
   <div class="content">
     {{ post.content }}
   </div>
-  -->
 {% endfor %}
 
 <!-- Pagination links -->

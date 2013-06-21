@@ -1,0 +1,14 @@
+---
+layout: post
+title: 插入排序
+categories: algorithm sorting
+tags: algorithm sorting
+---
+
+h4. 算法简述
+
+h4. 算法性能
+
+h4. 算法实现<notextile>(C)</notextile>
+
+h5. 注意事项

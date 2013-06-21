@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Begin to write
+categories: [life, begin]
 ---
 
 Here is the first baby step. :)

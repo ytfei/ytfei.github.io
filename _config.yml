@@ -3,3 +3,4 @@ lsi: false
 markdown: rdiscount
 pygments: true
 paginate: 2
+permalink: /:categories/:year/:month/:day/:title/
