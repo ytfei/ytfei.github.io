@@ -15,6 +15,8 @@ title: CodingME!
   </div>
 {% endfor %}
 
+<div id="baidu_login">
+</div>
 <!-- Pagination links -->
 
 <div id="post-pagination" class="pagination">
@@ -64,3 +66,16 @@ title: CodingME!
   </ul>
 
 </div>
+
+
+<script type="text/javascript" id="bd_soc_login_boot"></script>
+<script type="text/javascript">
+(function(){
+    var t = new Date().getTime(),
+        script = document.getElementById("bd_soc_login_boot"),
+        redirect_uri = encodeURIComponent("http://localhost:4000"),
+        domid = "baidu_login",
+        src = "http://openapi.baidu.com/social/oauth/2.0/connect/login?redirect_uri=" + redirect_uri + "&domid=" + domid + "&client_type=web&response_type=code&media_types=sinaweibo%2Cqqdenglu%2Cbaidu%2Cqqweibo%2Ckaixin%2Crenren&size=-1&button_type=4&client_id=DunWCEViAH9cMzCnGug3nDVx&view=embedded&t=" + t;
+    script.src = src;
+})();
+</script>
