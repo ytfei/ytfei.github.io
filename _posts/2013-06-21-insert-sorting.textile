@@ -5,10 +5,10 @@ categories: algorithm sorting
 tags: algorithm sorting
 ---
 
-h4. 算法简述
+h1. 算法简述
 
-h4. 算法性能
+h1. 算法性能
 
-h4. 算法实现<notextile>(C)</notextile>
+h1. 算法实现<notextile>(C)</notextile>
 
-h5. 注意事项
+h2. 注意事项

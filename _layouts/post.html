@@ -2,7 +2,7 @@
 layout: default
 categories: me
 ---
-<h3>{{ page.title }}</h3>
+<h1>{{ page.title }}</h1>
 <div id="toc"></div>
 
 <div id="post">
@@ -12,7 +12,7 @@ categories: me
 <!-- The toc script should be put blow post content, or it cannot find the heads.  -->
 <script type="text/javascript">
 $('#toc').toc({
-    'selectors': 'h3,h4,h5', //elements to use as headings
+    'selectors': 'h1,h2,h3,h4,h5', //elements to use as headings
     'container': '#post', //element to find all selectors in
     'smoothScrolling': true, //enable or disable smooth scrolling on click
     'prefix': 'toc', //prefix for anchor tags and class names
