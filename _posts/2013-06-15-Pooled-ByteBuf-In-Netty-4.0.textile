@@ -1,0 +1,20 @@
+---
+layout: post
+title: PooledByteBuf in Netty 4.0
+categories: java netty
+---
+
+h3. Netty 4.0 中的 ByteBuf 模型
+
+ByteBuf
+
+h3. jemalloc 简介
+
+Buddy
+Slab
+
+h3. Netty 中 jemalloc 的实现
+
+h4. 内存的分配
+
+h4. 内存的回收
