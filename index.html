@@ -1,1 +1,66 @@
-I'm building a GitHub Pages project....
+---
+layout: default
+title: CodingME!
+---
+<!-- This loops through the paginated posts -->
+{% for post in paginator.posts %}
+  <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
+  <p class="author">
+    <span class="date">{{ post.date }}</span>
+  </p>
+  <!--
+  -->
+  <div class="paginator_content" id="paginator_content">
+    {{ post.content }}
+  </div>
+{% endfor %}
+
+<!-- Pagination links -->
+
+<div id="post-pagination" class="pagination">
+  <ul class="pages">
+
+  {% if paginator.previous_page %}
+      <li class="eabled">
+      {% if paginator.previous_page == 1 %}
+        <a href="/">Previous</a>
+      {% else %}
+        <a href="{{ paginator.previous_page_path }}">Previous</a>
+      {% endif %}
+      </li>
+  {% else %}
+      <li class="disabled">
+        <a href="/">Previous</a>
+      </li>
+  {% endif %}
+
+  <li class="page">
+    {% if paginator.page == 1 %}
+      <span class="current-page">1</span>
+    {% else %}
+      <a href="/">1</a>
+    {% endif %}
+  </li>
+
+  {% for count in (2..paginator.total_pages) %}
+    <li class="page">
+      {% if count == paginator.page %}
+        <span class="current-page">{{ count }}</span>
+      {% else %}
+        <a href="/page{{ count }}">{{ count }}</a>
+      {% endif %}
+    </li>
+  {% endfor %}
+
+  {% if paginator.next_page %}
+    <li class="eabled">
+      <a href="{{ paginator.next_page_path }}">Next</a>
+    </li>
+  {% else %}
+    <li class="disabled">
+      <span>Next</span>
+    </li>
+  {% endif %}
+  </ul>
+
+</div>
