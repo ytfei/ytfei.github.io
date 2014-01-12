@@ -11,6 +11,8 @@ h1 { font-size: 200% !important; font-weight: bold !important;}
 #post h3 { font-size: 120% !important; font-weight: bold !important;}
 #post h4 { font-size: 100% !important; font-weight: bold !important;}
 
+blockquote p { font-size: 100% !important; }
+
 /*Font size when display post in paginator flow*/
 #paginator_content h1 { font-size: 18pt; }
 #paginator_content h2 { font-size: 16pt; }
