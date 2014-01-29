@@ -2,5 +2,5 @@ safe: true
 lsi: false
 markdown: maruku
 pygments: true
-paginate: 2
+paginate: 10
 permalink: /:categories/:year/:month/:day/:title/

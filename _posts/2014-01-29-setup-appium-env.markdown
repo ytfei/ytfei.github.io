@@ -7,6 +7,10 @@ date: 2014-01-29 11:27:30 +0800
 
 [Appium](http://appium.io/)是Android平台上一个测试框架。
 
+本文简单地介绍如何在Linux机器上安装并运行该框架。
+
+<!--more-->
+
 > 应用环境：
 >
 > * Ubuntu 12.04 LTS
