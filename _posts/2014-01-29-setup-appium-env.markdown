@@ -18,7 +18,7 @@ date: 2014-01-29 11:27:30 +0800
 
 # Appium
 
-1. 安装`nodejs`
+## 安装 nodejs
 
 {% highlight bash %}
 apt-get install nodejs
@@ -34,13 +34,13 @@ make && make install
 # edit ~/.bashrc and add node to your PATH env
 {% endhighlight %}
 
-2. 安装`appium`
+## 安装 Appium 
 
 {% highlight bash %}
 npm install -g appium  # install appium as a global app
 {% endhighlight %}
 
-3. 配置手机
+## 配置手机
 
 手机需要是已经root过的！
 
@@ -56,7 +56,7 @@ chmod 777 /data/local
 >
 > 这步是必需的，否则后面会发生无法启动浏览器的异常。
 
-3. 下载&运行测试项目
+## 下载&运行测试项目
 
 {% highlight bash %}
 # 下载项目
