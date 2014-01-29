@@ -3,4 +3,4 @@ lsi: false
 markdown: maruku
 pygments: true
 paginate: 10
-permalink: /:categories/:year/:month/:day/:title/
+permalink: /blog/:categories/:year/:month/:day/:title/
