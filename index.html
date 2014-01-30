@@ -6,10 +6,8 @@ title: CodingME!
 {% for post in paginator.posts %}
   <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
   <p class="author">
-    <span class="date">{{ post.date | date_to_rfc822 }}</span>
+    <span class="date">{{ post.date | date: "%Y-%m-%d %H:%M" }}</span>
   </p>
-  <!--
-  -->
   <div class="paginator_content" id="paginator_content">
     {% if post.content contains '<!--more-->' %}
       {{ post.content | split:'<!--more-->' | first }}
