@@ -108,6 +108,45 @@ function for_test {
 echo $(cd $(dirname $0); pwd)/$(basename $0)
 {% endhighlight %}
 
+# 函数的使用
+
+关于函数，这是每门语言中的一个基本项，Shell脚本也不例外。之所以拿出说，是因为它我和想像中的（之前遇见的）函数不一样，
+或者说，很不一样。
+
+以这个函数为例子：
+
+{% highlight bash %}
+function clean_dir {
+  local target_dir=$(cd $(dirname $1); pwd)/$(basename $1)    # 第一个参数是目标目录
+  find $target_dir -type f -name '*.tmp' -print0 | xargs -0r rm -fr
+  local res=$?
+
+  if [ "$res" = "0" ] ; then
+    echo "succ"
+  else
+    echo "failed"
+  fi
+
+  return $res
+}
+{% endhighlight %}
+
+首先参数的处理，不需要在函数定义明确声明到底接受多少参数，且参数的获取与脚本在获取命令行参数时是一样的。
+`$1` 是第一个参数，`$2`是第二个，然后依次。但是，**`$0` 不是函数名，而是脚本名！**
+
+函数的返回值，是最后一条命令的退出状态（如果没有显示地使用 `return` 语句的话）。如果你要返回一个字符窜什么，
+那该怎么办？`echo "a string"` 可以用用，但是，不够优雅。好像还没有很好的方法。
+
+{% highlight bash %}
+clean_dir /some/dir/path
+echo $?  # 这是clean_dir的返回值，即退出状态。似曾相识吧？！
+
+res=`clean_dir /some/dir/path`  # 这样可以捕获函数的输出，也就是传递字符窜的方式
+{% endhighlight %}
+
+总之，在我看来，shell脚本中函数就是一段**完整的脚本的组合**。你甚至可以直接把它放到独立的文件，
+通过`./a_func param1 param2`的方式来调用。你看它处理参数的方式，被调用的方式就明白了。
+
 # 并发执行
 在需要协调多个任务时，非常有用的。
 
@@ -127,6 +166,14 @@ if [ "$failed" = "0" ] ; then
     echo "Got $failed failures"
 fi
 
+{% endhighlight %}
+
+`task.sh` 可以是一个单独的脚本，也可以是当前脚本里面的一个函数。如果是一个函数，则：
+
+{% highlight bash %}
+task a &
+task b &
+task c &
 {% endhighlight %}
 
 ## find & mv 
