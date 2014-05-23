@@ -1,6 +1,8 @@
 safe: true
 lsi: false
-markdown: maruku
+markdown: kramdown
+kramdown:
+  input: GFM
 pygments: true
 paginate: 10
 permalink: /blog/:categories/:year/:month/:day/:title/
