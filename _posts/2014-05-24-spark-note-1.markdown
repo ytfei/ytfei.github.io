@@ -2,6 +2,7 @@
 layout: post
 title: Spark 笔记（一）
 categories: [cloud, spark]
+date: 2014-05-24 10:28:00 +0800
 ---
 
 [Spark](http://spark.apache.org/) 是众多的分布式计算框架中的一员，与 [Hadoop](http://hadoop.apache.org/) 
