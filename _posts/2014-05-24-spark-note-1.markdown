@@ -1,0 +1,90 @@
+---
+layout: post
+title: Spark 笔记（一）
+categories: [cloud, spark]
+---
+
+[Spark](http://spark.apache.org/) 是众多的分布式计算框架中的一员，与 [Hadoop](http://hadoop.apache.org/) 
+框架是同类，但不同的是，Spark是一个**基于内存计算**的开源的集群计算系统，目的是让数据分析更加快速。
+
+Spark使用的是Scala语言，由加州伯克利大学AMP实验室研发，现为Apache顶级开源项目。
+
+以下内容主要是基于 Spark 最新版，v0.9.1 。
+
+<!--more-->
+
+由于我对其它的分布式计算框架并不了解，这里我也不与其它框架做比较了，有兴趣的可以去查阅相资料。
+但基于我的 Spark 使用体验，它的速度还是非常快的，而且接口也相当简单（可能是国为我之前用过一段时间
+的 Scala）。
+
+已经有很多文章介绍 Spark 的整体架构，我就不在这里重复了，以下是我收集到的一个列表：
+
+1. [低延迟大规模并行处理架构Spark简介](http://www.searchdatabase.com.cn/showcontent_79727.htm)
+2. [Spark随谈（一）总体架构](http://www.kankanews.com/ICkengine/archives/25556.shtml)
+3. [Spark，一种快速数据分析替代方案](http://www.ibm.com/developerworks/cn/opensource/os-spark/)
+
+我这里只着重说明一下 Spark 中的几个重要的概念。
+
+不像 Hadoop 集数据存储(HDFS)与数据计算(MapReduce)于一体，Spark 只有计算模块，不负责数据存储（中间数据不算）。
+把 Spark 当作一个黑盒，它从外部获取数据，然后按用户提供的公式计算出结果。当然，Spark 与 HDFS 之间的兼容性是最好的。
+明白这一点后，我们就来说说 Spark 的精华，RDD。
+
+--------
+
+## Resilient Distributed Datasets (RDDs)
+
+直译就是，**弹性的分布式数据集**。分布式数据集比较好理解，但什么是**弹性**呢？我个人的理解是，
+弹性可以从多个方面解释。一是数据的存储（临时存储）是弹性的，当内存不够用时，数据会被交换到磁盘上，这是一个常规的处理手段。
+二是数据的获取是弹性的。一个 `RDD` 对象，要么指定了数据所在的位置，如文件路径，要么就提供了计算出数据的流程，
+这样就可以动态地计算出 RDD 中的数据内容。
+
+总的来说，**弹性**只对内部实现而言，不是对外接口。对于 Spark 提供的计算接口，
+用户可以假定每个 RDD 就是一个包含了特定数据的集合。 但是当你打 Spark 的代码时，你会发现，在用到某个 RDD 时，
+它并不一定包含这些数据， 这时系统便会根据这个RDD的依赖关系以及用户提供的计算公式，来一级一级地计算并得到最终结果。
+
+## RDD 提供的计算方法
+
+> RDDs support *two types* of operations: 
+> **transformations**, which create a new dataset from an existing one, and 
+> **actions**, which return a value to the driver program after running a computation on the dataset. 
+
+RDD 提供了两类数据计算方法，一类是用于转换数据集的(transformations), 一类是用来触发执行的(actions)。
+**转换操作**是在已有的数据集上做一些处理，然后生成新的数据集。
+
+{% highlight scala %}
+// 读取文件来创建一个原始的数据集，这个数据集中的数据是一行一行的文本
+var lines = sc.textFile("hdfs://path/to/some/text/file") 
+var words = lines.flatmap(line => line.split(" ")).map(w => (w, 1))
+{% endhighlight %}
+
+在上面的代码中，`flatmap` 和 `map` 都是转换操作，这些操作是结果是将一个包含数据类型为A的RDD，
+转换为一个包含数据为B的RDD。但是这些操作是延迟执行，并不立即触发。
+
+**动作**(actions)则触发操作，它会将之前的所有转换动作都提交到集群中执行，并将执行完成后的结果都取回来。
+
+{% highlight scala %}
+var counts = words.reduceByKey(_ + _)
+{% endhighlight %}
+
+如 `reduceByKey` 就会触发操作，并计算出结果。
+
+[Spark 官方文档](http://spark.apache.org/docs/latest/scala-programming-guide.html#rdd-operations) 
+已经对这些操作进行了详细的归类。
+
+另外，转换操作是非阻塞的，而动作则是同步阻塞，直到得到了计算结果后，才开始继续前行。
+
+## RDD 在计算集群中的分布
+
+虽然 Spark 并不对外提供数据存储服务，但内部还是需要某种方式能够将外部输入的数据均匀地分布开来，
+这样在执行计算任务时，才能够高效地利用所有的资源
+（将计算任务尽可能地分配到离数据最近的地方，后续的章节会详细地描述 Spark 任务分配的规则）。
+在 Spark 中负责数据管理的组件是 **BlockManager**，它会参考每个 RDD 的期望存储级别，
+即 `StorageLevel`。一个StorageLevel由以下几个选项组成：
+
+* 存储到内存：将数据存储到内存中
+* 存储到磁盘：将数据存储到磁盘中
+* 序列化数据后再存储：这是以CPU为代价来减少存储空间的占用
+* 存储的份数（至少为一份）：数据在集群中存储的份数越多，则计算任务分配是就越灵活。
+  但这种方式对存储空间占用就更多了。
+
+这些选项可以由用户任务组合，用户可以在CPU效率、内存量及任务的并行度之间做均衡。
