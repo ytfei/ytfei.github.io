@@ -1,0 +1,161 @@
+---
+layout: post
+title: Spark 笔记（二）
+categories: [cloud, spark]
+date: 2014-05-25 11:06:00 +0800
+---
+
+Spark 集群是由 一个 `master`（集群） 和 一个以上的 `worker` 节点组成，为避免 master 节点单点失败的问题，
+用户可以将启动多个 master 节点来组建 master 集群。本文主要详细介绍 Spark 集群的组成及各个组件的工作方式。
+
+<!-- more -->
+
+## Spark 集群的组成
+
+Spark 集群是由 一个 `master` 和 一个以上的 `worker` 节点组成。master 主要负责管理用户提交的计算任务，
+并维护各个worker节点的状态——总的来说，它是负责资源维护及分配。master 维护的状态数据不多，主要分为
+application （应用数据），driver （驱动数据），以及 worker 的数据。然后 master 会按需将 worker 
+中的计算资源分配给 application 或者 driver。
+
+下图是 Spark 集群实例的一个简图，该图假定 Spark 是以 
+[Standalone](http://spark.apache.org/docs/latest/spark-standalone.html) 的方式部署的：
+
+![Spark 集群结构](http://blog-codingme.qiniudn.com/cm-sparkspark-cluster1.png)
+
+> 图中，master 节点是以集群的方式出现，下文 [Master Failover](#master_failover) 会详细说明 master 的组织结构。
+
+当用户部署应用之后，集群的状态看起来类似于下图：
+![应用部署结构图](http://blog-codingme.qiniudn.com/cm-sparkspark-cluster2.png)
+
+
+## 主节点恢复方式 {#master_failover}
+
+如果集群中，只有一个主节点 (master node) 就会存在单点失败的问题——当这个主节点失败后，整个集群就无法再正常工作。
+为了避免这个问题，目前 Spark 提供了几个方案来解决/缓和这个问题：
+
+* 单主节点状态持久化
+* 多主节点备份，且这多个主节点之间又会选举出一个领导，负责对外事务。
+
+### 主节点集群
+
+多个 master 节点通过适当的配置，加入到同一个 zookeeper 环境中，然后通过 Zookeeper 选举出一个 master Leader，
+worker 节点则与 Leader 之前通信。非 Leader 节点则进入备份状态。当 master leader 无法工作时，其它的 master 节点则会选举出新的 leader，系统进入恢复状态。恢复状态可能会持续几分钟，在此期间，已经运行的应用将不会受到影响，
+但是新的应用是无法被处理的。当恢复状态结束后，系统便可正常运行。
+
+这种切换模式的前提是，master leader 需要将自己的状态持久化到 Zookeeper 中，
+这样后继者才可以从前任的数据中恢复工作。因为，Zookeeper 主要提供了节点选举和数据存储的服务。
+
+启用多 master 集群，需要进行以下配置：
+
+<table class="table">
+	<tr>
+		<th>系统属性</th>
+		<th>描述</th>
+	</tr>
+	<tr>
+		<td>spark.deploy.recoveryMode</td>
+		<td>恢复模式需要设置为 <b>ZOOKEEPER</b>（默认是 <i>NONE</i>）</td>
+	</tr>
+	<tr>
+		<td>spark.deploy.zookeeper.url</td>
+		<td>The ZooKeeper cluster url (e.g., 192.168.1.100:2181,192.168.1.101:2181).</td>
+	</tr>
+	<tr>
+		<td>spark.deploy.zookeeper.dir</td>
+		<td>在 Zookeeper 中存储数据的路径 (默认是 <code>/spark</code>).</td>
+	</tr>
+</table>
+
+> **NOTE:**
+>
+> 每个主节点的系统属性设置都必需一致，如果不统一，导致多个主节点群出现，且节点之间无法正常切换。
+
+在多主节点模式下，新的主节点可以随时加入，也可以随时退出。另外，由于多个主节点的存在，
+对新的应用提交也会有影响——客户程序需要把应用提交到当前的主节点领袖的手中，但哪一个才是领袖呢？
+无需用户自己判断，只要指定一组主节点路径，系统自己会解决领袖节点识别的问题，如下：
+
+{% highlight bash %}
+spark://host1:port1,host2:port2
+{% endhighlight %}
+
+系统会自动地识别出谁是 leader。
+
+> 事实上，客户端会向所有用户提供的主节点注册，但是非领导的主节点不会理会注册请求，
+> 这样，在客户端看起来，系统好像是自己识别出了主节点了。
+
+### 单主节点
+
+产品环境下的首先，自然是与 Zookeeper 结合的多主节点备份方式。但是如果仅仅是内部测试或小范围的使用，
+就不必大费周章了。Spark 提供了一个 **FILESYSTEM** 模式——一个更简单的失败恢复方式，
+只需要重启挂掉了的主节点，一切就可以继续了。在这种模式下，由于只有一个主节点，自然就不需要选举，
+所以只有数据状态存储的工作了。**FILESYSTEM** 就是把数据状态存储到本地磁盘上，主节点如果挂了，
+重启时会从之前的数据中恢复状态。
+
+启动该模式需要的配置有：
+
+<table class="table">
+	<tr>
+		<th>系统属性</th>
+		<th>描述</th>
+	</tr>
+	<tr>
+		<td>spark.deploy.recoveryMode</td>
+		<td>恢复模式需要设置为 <b>FILESYSTEM</b>（默认是 <i>NONE</i>）</td>
+	</tr>
+	<tr>
+		<td>spark.deploy.recoveryDirectory</td>
+		<td>主节点将会把数据存储到这个路径</td>
+	</tr>
+</table>
+
+> **NOTE:**
+>
+> **FILESYSTEM** 模式虽然看起来要比不使用任务恢复模式（默认情况）要好，但它也并不是适用所有场景。
+> 首先，启用恢复模式会增加节点的启动时间，因为多一个恢复前任数据的过程。其次，如果是在开发环境中使用，
+> 则每次主节点重启都会保留之前的状态，环境污染会产品不准确的结果。所以为开发使用时，
+> 就不必启动恢复模式了。
+
+## 工作节点 Worker
+
+工作节点（Woker）启动后，会向主要点注册，并提交自己可以用于计算的资源。在 *Spark Standalone*环境下，
+工作节点的资源主要是CPU核数和内存量。工作节点所在机器有几个核，就算几个，而内存大小，
+则是系统物理内存减去 1G 后剩余的（如果内存不够 1G，则默认为 512M）。
+
+{% highlight scala %}
+  // 默认核数
+
+  def inferDefaultCores(): Int = {
+    Runtime.getRuntime.availableProcessors()
+  }
+
+
+  // 默认内存大小
+
+  def inferDefaultMemory(): Int = {
+    var totalMb = 0
+    
+    ......
+
+    // Leave out 1 GB for the operating system, but don't return a negative memory size
+    math.max(totalMb - 1024, 512)
+  }
+{% endhighlight %}
+
+
+主节点收到工作节点提交的资源信息后，会按需将它们分配给用户的应用程序 (application)，这个分配过程大致是：
+
+1. 查看应用程序需要多少资源，并检查当前的工作节点是否满足条件
+2. 如果满足条件，则让工作节点生成执行引擎 (Executor)
+3. 执行引擎启动后就会像驱动程序 (Driver) 注册
+
+至此，如果没有意外的话，剩下的事情就由执行引擎与驱动程序去完成了。（见图二）。
+
+## 执行引擎 Executor
+
+执行引擎则是具体负责干活的。它初始化完成后便注册到驱动程序，并接收和执行驱动发送过来的任务，
+然后返回相应的结果。
+
+## 驱动程序 Driver
+
+驱动程序（Driver）即是用户程序，一切计算任务都是从它这里开始触发的。用户编写代码制定计算过程，
+驱动程序则将计算过程按数据的组织方式分解成合适的结构，然后发送至执行引擎。
