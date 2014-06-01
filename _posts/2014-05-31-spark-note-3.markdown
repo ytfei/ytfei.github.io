@@ -1,0 +1,88 @@
+---
+layout: post
+title: Spark 笔记（三）之 任务划分
+categories: [cloud, spark]
+date: 2014-05-31 11:20:00 +0800
+---
+
+`DAGSchduler` 是用来划分任务结构以建立 `Stage` 关系的。可以认为 `Stage` 建立了任务的执行范围，
+指定任务从哪里开始以及任务在什么地方结束。同时它还表示一组物理上的任务集。
+
+<!-- more -->
+
+## RDD 的生成路径
+
+我们从一个简单的例子——数单词——开始：
+
+{% highlight scala %}
+// we got a context here
+val sc: SparkContext = ....
+var lines =  new sc.textFile("hdfs://path/to/a/text/file")
+var words = lines.flatMap(l => l.split("")).map(w => (w, 1))
+var results = words.reduceByKey(_ + _)
+
+// 取回结果并打印出来
+results.collect.foreach {(w, n) => println(s"$w : $n")}
+{% endhighlight %}
+
+这段代码会从 HDFS 中读取一个文本文件，该文件读入到 Spark 中后，默认是按换行符分开的。
+接着，我们再将这些行 (`lines`) 拆分成单词，并生成元组。最后，数完单词并获取结果。
+
+这个看起来要比 `MapReduce` 的例子简单多了吧~~
+
+以上过程在 Spark 中是如何被执行的呢？
+
+以上代码会建立一个如下图的 RDD 结构：
+![RDD Relationship](http://blog-codingme.qiniudn.com/cm-sparkspark-rdd-relationship1.png)
+
+图中， `flatMap`, `map` 操作都会建立相应的 RDD，但是 `reduceByKey` 却建立了三个。
+其中有一个重要的 RDD 是 `ShuffleRDD`，后面我们会重点讨论。
+
+## Stage 的形成
+
+我们知道了 RDD 的路径，同时也了解到 RDD 之间是由一系列的依赖关系 (`Dependency`) 组织在一起的。
+那它们现在的依赖关系是什么样的呢？
+
+![RDD dependency](http://blog-codingme.qiniudn.com/cm-sparkspark-rdd-relationship2.png)
+
+图中显示出了两类依赖关系，`OneToOneDependency` 和 `ShuffleDependency`。看到 `ShuffleDependency` 
+的红色箭头，想必知道了它与众不同。是的，它就是 `Stage` 之间的界线。每当有 `ShuffleDependency`
+出现是，就会有新的 `Stage` 生成，同时也会伴有 `Shuffle` 操作出现。
+
+![Stage Relationship](http://blog-codingme.qiniudn.com/cm-sparkspark-rdd-relationship3.png)
+
+图中建立了两个 `Stage`，且 **Stage 1** 依赖于 **Stage 2**，这也意味着只有当 2 中的所有任务都执行完成了之后，
+1 才能开始执行。
+
+每个 Stage 都有着明确的开始和结束界线，如 **Stage 2** 是从 `HadoopRDD` 开始，至第一个 `MapPartitionsRDD` 结束。
+
+Stage 关系生成后，接着就是从 Stage 推导任务。在一个 Stage 中的所有 RDD 的分区数 (Partitions) 是相同的。每个 RDD
+中的同样位置的分区会被归纳到同一个任务中。
+
+![Stage to Task](http://blog-codingme.qiniudn.com/cm-spark-stage-task-rel.png)
+
+在红线框线中的一组分区将组成一个任务，其它的也一样。
+
+## 依赖关系
+
+Spark 中的任务分为两类，`ShuffleMapTask` 和 `ResultTask`。前者相对复杂，主要是在增加了 `Shuffle` 相关的过程，
+后者相关简单清晰，就是按执行 RDD 中的过程，然后返回结果给 `Driver` 程序。任务类型的选定，是由 Stage 
+之间的依赖关系确定。在上面的环境中，`Stage 1` 与 `Stage 2`是 `Shuffle` 类型的依赖关系，且 `Stage 2` 
+是**被依赖者**，因此由它推导出来的任务都属于 `ShuffleMapTask`，而 `Stage 1` 将会是一个 `ResultTask`。
+
+通过一系列过程，我们也看出了 RDD **依赖关系**在任务生成过程中所扮演的重要角色了。Spark 中的依赖关系有哪些呢？
+
+![RDD Dependency](http://blog-codingme.qiniudn.com/cm-sparkspark-rdd-dependency.png)
+
+图中被着色的两个是之前出现过后，也是被使用得最频繁的两类依赖关系，其它的个 `OneToOneDependency` 则如下：
+
+![Rang Dependency](http://blog-codingme.qiniudn.com/cm-sparkspark-rdd-dependency2.png)
+
+`RangeDependency` 主要出现的 RDD 之间的 `union` 操作中。
+
+![Prune Dependency](http://blog-codingme.qiniudn.com/cm-sparkspark-rdd-dependency3.png)
+
+`PruneDependency` 出现的场景较少，当我们只是选择性是使用 RDD 中的部分分区时会用到它。
+
+回过头来看看这些依赖关系，最为特殊的还是 `ShuflleDependency`，而它出现的主要场景往往会导致分区的变化
+（或者说分区内容的变化），这种变化的源由是 **分区内容来源** 的不确定性。
