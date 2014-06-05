@@ -1,0 +1,383 @@
+---
+layout: post
+title: Linux Sed 命令
+categories: [linux, sed]
+date: 2014-06-05 22:24:10 +0800
+---
+
+**sed** 是非交互式的编辑器。它不会修改文件，除非使用 Shell 重定向来保存结果。默认情况下，所有的输出行都被打印到屏幕上。
+sed 编辑器逐行处理文件（或输入），并将结果发送到屏幕。具体过程如下：
+
+* 首先sed把当前正在处理的行保存在一个临时缓存区中（也称为模式空间），
+* 然后处理临时缓冲区中的行，完成后把该行发送到屏幕上。
+
+sed 每处理完一行就将其从临时缓冲区删除，然后将下一行读入，进行处理和显示。处理完输入文件的最后一行后，sed 便结束运行。
+sed 把每一行都存在临时缓冲区中，对这个副本进行编辑，所以不会修改原文件。
+
+<!--more-->
+
+## 基础
+
+先介绍 sed 操作的一些基础知识。
+
+### 如何确定行地址
+
+定址用于决定对哪些行进行编辑。地址的形式可以是数字、正则表达式、或二者的结合。
+如果没有指定地址，sed将处理输入文件的所有行。
+
+地址是一个数字，则表示行号；是“$"符号，则表示最后一行。
+
+{% highlight bash %}
+# 打印第三行
+sed -n '3p' data
+{% endhighlight %}
+
+ 只显示指定行范围的文件内容，例如：
+
+ {% highlight bash %}
+# 只查看文件的第100行到第200行
+sed -n '100,200p' mysql_slow_query.log
+ {% endhighlight %}
+ 
+ 如果地址是**逗号分隔**的，那么需要处理的地址是这两行之间的范围（包括这两行在内）。
+ 范围可以用**数字、正则表达式、或二者的组合**表示。例如：
+
+{% highlight bash %}
+#删除第二到第五行
+sed '2,5d' datafile
+
+#删除包含"My"的行到包含"You"的行之间的行
+sed '/My/,/You/d' datafile
+
+#删除包含"My"的行到第十行的内容
+sed '/My/,10d' datafile
+{% endhighlight %}
+
+
+### 命令/选项
+
+sed命令告诉sed如何处理由地址指定的各输入行，如果没有指定地址则处理所有的输入行。
+
+#### 命令
+
+<table class="table">
+	<tr> <th>命令</th> <th>功能</th> </tr>
+	<tr><td>a</td><td>在当前行后添加一行或多行。多行时除最后一行外，每行末尾需用“\”续行</td></tr>
+	<tr><td>c</td><td>用此符号后的新文本替换当前行中的文本。多行时除最后一行外，每行末尾需用"\"续行 </td></tr>
+	<tr><td>i</td><td>在当前行之前插入文本。多行时除最后一行外，每行末尾需用"\"续行 </td></tr>
+	<tr><td>d</td><td>删除行 </td></tr>
+	<tr><td>h</td><td>把模式空间里的内容复制到暂存缓冲区 </td></tr>
+	<tr><td>H</td><td>把模式空间里的内容追加到暂存缓冲区 </td></tr>
+	<tr><td>g</td><td>把暂存缓冲区里的内容复制到模式空间，覆盖原有的内容 </td></tr>
+	<tr><td>G</td><td>把暂存缓冲区的内容追加到模式空间里，追加在原有内容的后面 </td></tr>
+	<tr><td>l</td><td>列出非打印字符 </td></tr>
+	<tr><td>p</td><td>打印行 </td></tr>
+	<tr><td>n</td><td>读入下一输入行，并从下一条命令而不是第一条命令开始对其的处理 </td></tr>
+	<tr><td>q</td><td>结束或退出sed </td></tr>
+	<tr><td>r</td><td>从文件中读取输入行 </td></tr>
+	<tr><td>!</td><td>对所选行以外的所有行应用命令 </td></tr>
+	<tr><td>s</td><td>用一个字符串替换另一个 </td></tr>
+	<tr><td>g</td><td>在行内进行全局替换  </td></tr>
+	<tr><td>w</td><td>将所选的行写入文件 </td></tr>
+	<tr><td>x</td><td>交换暂存缓冲区与模式空间的内容 </td></tr>
+	<tr><td>y</td><td>将字符替换为另一字符（不能对正则表达式使用y命令）</td></tr>
+</table>
+
+#### 选项
+
+<table class="table">
+	<tr><th>选项</th><th>功能 </th></tr>
+	<tr><td>-e</td><td>进行多项编辑，即对输入行应用多条sed命令时使用 </td></tr>
+	<tr><td>-n</td><td>取消默认的输出 </td></tr>
+	<tr><td>-f</td><td>指定sed脚本的文件名</td></tr>
+</table>
+
+> **NOTE:**
+>
+> sed 不向grep一样，不管是否找到指定的模式，它的退出状态都是0。
+> 只有当命令存在语法错误时，sed的退出状态才不是0。
+
+## 正则表达式
+
+与grep一样，sed也支持特殊元字符，来进行模式查找、替换。
+不同的是，sed使用的正则表达式是括在斜杠线"/"之间的模式。
+如果要把正则表达式分隔符"/"改为另一个字符，比如o，只要在这个字符前加一个反斜线，
+在字符后跟上正则表达式，再跟上这个字符即可。例如：sed -n '\o^Myop' datafile
+
+<table class="table">
+	<tr> <th>元字符</th> <th>功能</th> <th>示例</th> </tr>
+	<tr><td>^</td><td>行首定位符 /^my/</td><td>  匹配所有以my开头的行 </td></tr>
+	<tr><td>$</td><td>行尾定位符 /my$/</td><td>  匹配所有以my结尾的行 </td></tr>
+	<tr><td>.</td><td>匹配除换行符以外的单个字符</td><td> /m..y/  匹配包含字母m，后跟两个任意字符，再跟字母y的行 </td></tr>
+	<tr><td>*</td><td>匹配零个或多个前导字符</td><td> /my*/  匹配包含字母m,后跟零个或多个y字母的行 </td></tr>
+	<tr><td>[]</td><td>匹配指定字符组内的任一字符</td><td> /[Mm]y/  匹配包含My或my的行 </td></tr>
+	<tr><td>[^]</td><td>匹配不在指定字符组内的任一字符</td><td> /[^Mm]y/  匹配包含y，但y之前的那个字符不是M或m的行 </td></tr>
+	<tr><td>\(..\)</td><td>保存已匹配的字符</td><td> 1,20s/\(you\)self/\1r/  标记元字符之间的模式，并将其保存为标签1，之后可以使用\1来引用它。最多可以定义9个标签，从左边开始编号，最左边的是第一个。此例中，对第1到第20行进行处理，you被保存为标签1，如果发现youself，则替换为your。 </td></tr>
+	<tr><td>&amp;</td><td>保存查找串以便在替换串中引用</td><td> s/my/**&amp;**/  符号&amp;代表查找串。my将被替换为**my** </td></tr>
+	<tr><td>\&lt;</td><td>词首定位符</td><td> /\&lt;my/  匹配包含以my开头的单词的行 </td></tr>
+	<tr><td>\&gt;</td><td>词尾定位符</td><td> /my\&gt;/  匹配包含以my结尾的单词的行 </td></tr>
+	<tr><td>x\{m\}</td><td>连续m个x</td><td> /9\{5\}/ 匹配包含连续5个9的行 </td></tr>
+	<tr><td>x\{m,\}</td><td>至少m个x</td><td> /9\{5,\}/  匹配包含至少连续5个9的行 </td></tr>
+	<tr><td>x\{m,n\}</td><td>至少m个，但不超过n个x</td><td> /9\{5,7\}/  匹配包含连续5到7个9的行</td></tr>
+</table>
+
+## 示例
+
+### p 命令
+
+命令p用于显示模式空间的内容。**默认情况下，sed把输入行打印在屏幕上**，选项-n用于取消默认的打印操作。
+当选项 `-n` 和命令 `p` **同时** 出现时，sed 可打印选定的内容。
+
+{% highlight bash %}
+# 默认情况下，sed把所有输入行都打印在标准输出上。
+# 如果某行匹配模式my，p命令将把该行另外打印一遍。
+sed '/my/p' datafile
+
+# 选项-n取消sed默认的打印，p命令把匹配模式my的行打印一遍。
+sed -n '/my/p' datafile
+{% endhighlight %}
+
+### d 命令
+
+命令d用于删除输入行。sed先将输入行从文件复制到模式空间里，然后对该行执行sed命令，
+最后将模式空间里的内容显示在屏幕上。如果发出的是命令d，当前模式空间里的输入行会被删除，不被显示。
+
+{% highlight bash %}
+# 删除最后一行，其余的都被显示
+sed '$d' datafile
+
+# 删除包含my的行，其余的都被显示
+sed '/my/d' datafile
+{% endhighlight %}
+
+### s 命令
+
+{% highlight bash %}
+# 命令末端的g表示在行内进行全局替换，也就是说如果某行出现多个My，所有的My都被替换为You。
+sed 's/^My/You/g' datafile
+
+# 取消默认输出，处理1到20行里匹配以My结尾的行，把行内所有的My替换为You，并打印到屏幕上。
+sed -n '1,20s/My$/You/gp' datafile
+{% endhighlight %}
+
+另外，在 `s` 命令中，分隔符默认为正斜杠，但可以改变。。
+无论什么字符（换行符、反斜线除外），只要紧跟s命令，就成了新的窜分隔符。：
+
+{% highlight bash %}
+# 紧跟在s命令后的字符就是查找串和替换串之间的分隔符。
+sed 's#My#Your#g' datafile
+{% endhighlight %}
+
+
+### e 选项
+
+`-e` 是编辑命令，用于sed执行**多个**编辑任务的情况下。
+在下一行开始编辑前，所有的编辑动作将应用到模式缓冲区中的行上。
+
+{% highlight bash %}
+# 选项-e用于进行多重编辑。
+# 第一重编辑删除第1-3行。第二重编辑将出现的所有My替换为Your。
+# 因为是逐行进行这两项编辑（即这两个命令都在模式空间的当前行上执行），所以编辑命令的顺序会影响结果。
+
+sed -e '1,10d' -e 's/My/Your/g' datafile
+{% endhighlight %}
+
+### r 命令
+
+`r` 命令是读命令。sed 使用该命令将一个文本文件中的内容加到当前文件的特定位置上。
+
+{% highlight bash %}
+# 如果在文件datafile的某一行匹配到模式My，就在该行后读入文件introduce.txt的内容。
+# 如果出现My的行不止一行，则在出现My的各行后都读入introduce.txt文件的内容。
+sed '/My/r introduce.txt' datafile
+{% endhighlight %}
+
+### w 命令
+
+与 `r` 相对的是 `w` 写命令。它将所有匹配的行内容都写到指定的文件中去。
+
+{% highlight bash %}
+# 将匹配 hrwang 的行全部写到 me.txt 文件中
+sed -n '/hrwang/w me.txt' datafile
+{% endhighlight %}
+
+### a/i/c 命令
+
+这三个命令功能相似。
+
+* `a` 将新的文本添加到当前行（匹配的）的后面
+* `i` 将新的文本插入到当前行（匹配的）的前面
+* `c` 用新的文本替换当前行（匹配的）的内容
+
+> **NOTE:**
+>
+> 如果新的文本内容有多行，则用 `\` 分隔续行。
+
+{% highlight bash %}
+# 如果在datafile文件中发现匹配以some day开头的行，
+# 则在该行下面追加 I go out with my family
+sed '/^some day/a\
+>I go out\
+>with my family' datafile
+
+# 用 i 或者 c 替换 a 命令，可以得到不同的效果。不一一举例了。
+{% endhighlight %}
+
+### n 命令
+
+sed 使用该命令获取输入文件的下一行，并将其读入到模式缓冲区中，
+任何sed命令都将应用到匹配行紧接着的下一行上。
+
+{% highlight bash %}
+sed '/hrwang/{n;s/My/Your/;}' datafile
+{% endhighlight %}
+
+> **NOTE:**
+>
+> 如果需要使用多条命令，或者需要在某个地址范围内嵌套地址，
+> 就必须用花括号将命令括起来，每行只写一条命令，或这用分号分割同一行中的多条命令。
+
+### y 命令
+
+该命令与UNIX/Linux中的tr命令类似，字符按照一对一的方式从左到右进行转换。
+例如，y/abc/ABC/将把所有小写的a转换成A，小写的b转换成B，小写的c转换成C。
+
+{% highlight bash %}
+# 将1到20行内，所有的小写hrwang转换成大写，将1转换成^,将2转换成$。
+# 正则表达式元字符对y命令不起作用。与s命令的分隔符一样，斜线可以被替换成其它的字符。
+sed '1,20y/hrwang12/HRWANG^$/' datafile
+{% endhighlight %}
+
+### q 命令
+
+q命令将导致sed程序退出，不再进行其它的处理。
+
+{% highlight bash %}
+sed '/hrwang/{s/hrwang/HRWANG/;q;}' datafile
+{% endhighlight %}
+
+
+## sed 脚本
+
+sed 脚本就是写在文件中的一列sed命令。
+脚本中，要求命令的末尾不能有任何多余的空格或文本。如果在一行中有多个命令，要用分号分隔。
+执行脚本时，sed 先将输入文件中第一行复制到模式缓冲区，然后对其执行脚本中所有的命令。
+每一行处理完毕后，sed再复制文件中下一行到模式缓冲区，对其执行脚本中所有命令。
+使用sed脚本时，不再用引号来确保sed命令不被shell解释。
+
+{% highlight bash %}
+# 数据文件
+evans@ubuntu:~$ cat data 
+this is a dog
+this is a cat
+dog loves cat
+
+# 脚本文件
+evans@ubuntu:~$ cat demo.sed
+3i\
+-----------------------------
+3,$s/\(dog\) loves \(cat\)/\2 loves \1/
+$a\
+They will love eachother forever！！ 
+
+# 脚本执行输出
+evans@ubuntu:~$ sed -f demo.sed data
+this is a dog
+this is a cat
+-----------------------------
+cat loves dog
+They will love eachother forever！！ 
+{% endhighlight %}
+
+## 高级应用
+
+### sed 如何处理数据
+
+sed 在正常情况下，将处理的行读入模式空间（pattern space），
+脚本中的 "sed-command" 就一条接着一条进行处理，知道脚本执行完毕。然后该行输出，模式空间（pattern space）被清空；
+接着，在重复执行刚才的动作，文件中的新的一行被读入，直到文件处理完毕。
+
+![sed process stream](http://blog-codingme.qiniudn.com/linux-sed-1.png)
+
+什么是Pattern Space，什么是Hold Space？
+pattern space 相当于车间sed把流内容在这里处理。
+hold space 相当于仓库，加工的半成品在这里临时储存。
+
+> 你可以将pattern space看成是一个流水线，所有的动作都是在“流水线”上执行的。
+> 而hold space是一个“仓库”，“流水线”上的东东都可以放到这里。
+
+### sed 高级命令
+
+sed 高级命令，即操作这些缓冲空间的命令有:
+
+* **g:** \[address\[,address\]\]g 将hold space中的内容拷贝到pattern space中，原来pattern space里的内容清除
+* **G:** \[address\[,address\]\]G 将hold space中的内容append到pattern space
+* **h:** \[address\[,address\]\]h 将pattern space中的内容拷贝到hold space中，原来的hold space里的内容被清除
+* **H:** \[address\[,address\]\]H 将pattern space中的内容append到hold space
+* **d:** \[address\[,address\]\]d 删除pattern中的所有行，并读入下一新行到pattern中
+* **D:** \[address\[,address\]\]D 删除multiline pattern中的第一行，不读入下一行
+
+由于各种各样的原因，比如用户希望在某个条件下脚本中的某个命令被执行，
+或者希望模式空间得到保留以便下一次的处理，都有可能使得sed在处理文件的时候不按照正常的流程来进行。
+这个时候，sed设置了一些高级命令来满足用户的要求。
+
+> **NOTE:**
+>
+> 附上英文的解释：
+> The "h" command **copies** the pattern buffer into the hold buffer. 
+> The pattern buffer is unchanged. Instead of exchanging the hold space with the pattern space, 
+> you can copy the hold space to the pattern space with the "g" command. 
+> This deletes the pattern space. If you want to append to the pattern space, use the "G" command. 
+> This adds a new line to the pattern space, and **copies** the hold space after the new line.
+
+示例：文件内容倒序输出
+
+{% highlight bash %}
+evans@ubuntu:~$ for ((i=0; i<5; i++)) do echo $i >> demo; done
+evans@ubuntu:~$ cat demo
+0
+1
+2
+3
+4
+evans@ubuntu:~$ sed '1!G;h;$!d' demo 
+4
+3
+2
+1
+0
+{% endhighlight %}
+
+> **注释:**
+> `1!G` 表示**第一行**不执行 `G` 命令，即不从 hold buffer 中将内容 append 到 pattern buffer。
+> 从第二行开始。`$!d` 最后一行不删除。
+
+图解分析过程如下：
+
+* P: Pattern Space (Buffer)
+* H: Hold Space (Buffer)
+* 蓝色：Hold Space中的数据
+* 绿色：Pattern Space中的数据
+
+![sed demo](http://blog-codingme.qiniudn.com/linux-sed-2.png)
+
+## 实例
+
+**将文件中的所有行连接成一行**
+
+{% highlight bash %}
+# option 1 with sed
+sed -e :a -e '$!N; s/\n/ /; ta' current.txt
+
+# :a is a label, how to use label in sed?
+
+# option 2 with tr
+tr '\n' ' ' < input_filename
+{% endhighlight %}
+
+> **NOTE:**
+>
+> 本文是对以下文章的整理，对内容及格式进行适当的修改。
+> 
+> * [sed命令详解](http://www.cnblogs.com/edwardlost/archive/2010/09/17/1829145.html)
+> * [sed之G、H、g、h使用](http://www.cnblogs.com/fhefh/archive/2011/11/22/2259097.html)
