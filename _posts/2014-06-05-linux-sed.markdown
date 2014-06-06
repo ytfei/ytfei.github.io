@@ -61,35 +61,35 @@ sed命令告诉sed如何处理由地址指定的各输入行，如果没有指�
 #### 命令
 
 <table class="table">
-	<tr> <th>命令</th> <th>功能</th> </tr>
-	<tr><td>a</td><td>在当前行后添加一行或多行。多行时除最后一行外，每行末尾需用“\”续行</td></tr>
-	<tr><td>c</td><td>用此符号后的新文本替换当前行中的文本。多行时除最后一行外，每行末尾需用"\"续行 </td></tr>
-	<tr><td>i</td><td>在当前行之前插入文本。多行时除最后一行外，每行末尾需用"\"续行 </td></tr>
-	<tr><td>d</td><td>删除行 </td></tr>
-	<tr><td>h</td><td>把模式空间里的内容复制到暂存缓冲区 </td></tr>
-	<tr><td>H</td><td>把模式空间里的内容追加到暂存缓冲区 </td></tr>
-	<tr><td>g</td><td>把暂存缓冲区里的内容复制到模式空间，覆盖原有的内容 </td></tr>
-	<tr><td>G</td><td>把暂存缓冲区的内容追加到模式空间里，追加在原有内容的后面 </td></tr>
-	<tr><td>l</td><td>列出非打印字符 </td></tr>
-	<tr><td>p</td><td>打印行 </td></tr>
-	<tr><td>n</td><td>读入下一输入行，并从下一条命令而不是第一条命令开始对其的处理 </td></tr>
-	<tr><td>q</td><td>结束或退出sed </td></tr>
-	<tr><td>r</td><td>从文件中读取输入行 </td></tr>
-	<tr><td>!</td><td>对所选行以外的所有行应用命令 </td></tr>
-	<tr><td>s</td><td>用一个字符串替换另一个 </td></tr>
-	<tr><td>g</td><td>在行内进行全局替换  </td></tr>
-	<tr><td>w</td><td>将所选的行写入文件 </td></tr>
-	<tr><td>x</td><td>交换暂存缓冲区与模式空间的内容 </td></tr>
-	<tr><td>y</td><td>将字符替换为另一字符（不能对正则表达式使用y命令）</td></tr>
+    <tr> <th>命令</th> <th>功能</th> </tr>
+    <tr><td>a</td><td>在当前行后添加一行或多行。多行时除最后一行外，每行末尾需用“\”续行</td></tr>
+    <tr><td>c</td><td>用此符号后的新文本替换当前行中的文本。多行时除最后一行外，每行末尾需用"\"续行 </td></tr>
+    <tr><td>i</td><td>在当前行之前插入文本。多行时除最后一行外，每行末尾需用"\"续行 </td></tr>
+    <tr><td>d</td><td>删除行 </td></tr>
+    <tr><td>h</td><td>把模式空间里的内容复制到暂存缓冲区 </td></tr>
+    <tr><td>H</td><td>把模式空间里的内容追加到暂存缓冲区 </td></tr>
+    <tr><td>g</td><td>把暂存缓冲区里的内容复制到模式空间，覆盖原有的内容 </td></tr>
+    <tr><td>G</td><td>把暂存缓冲区的内容追加到模式空间里，追加在原有内容的后面 </td></tr>
+    <tr><td>l</td><td>列出非打印字符 </td></tr>
+    <tr><td>p</td><td>打印行 </td></tr>
+    <tr><td>n</td><td>读入下一输入行，并从下一条命令而不是第一条命令开始对其的处理 </td></tr>
+    <tr><td>q</td><td>结束或退出sed </td></tr>
+    <tr><td>r</td><td>从文件中读取输入行 </td></tr>
+    <tr><td>!</td><td>对所选行以外的所有行应用命令 </td></tr>
+    <tr><td>s</td><td>用一个字符串替换另一个 </td></tr>
+    <tr><td>g</td><td>在行内进行全局替换  </td></tr>
+    <tr><td>w</td><td>将所选的行写入文件 </td></tr>
+    <tr><td>x</td><td>交换暂存缓冲区与模式空间的内容 </td></tr>
+    <tr><td>y</td><td>将字符替换为另一字符（不能对正则表达式使用y命令）</td></tr>
 </table>
 
 #### 选项
 
 <table class="table">
-	<tr><th>选项</th><th>功能 </th></tr>
-	<tr><td>-e</td><td>进行多项编辑，即对输入行应用多条sed命令时使用 </td></tr>
-	<tr><td>-n</td><td>取消默认的输出 </td></tr>
-	<tr><td>-f</td><td>指定sed脚本的文件名</td></tr>
+    <tr><th>选项</th><th>功能 </th></tr>
+    <tr><td>-e</td><td>进行多项编辑，即对输入行应用多条sed命令时使用 </td></tr>
+    <tr><td>-n</td><td>取消默认的输出 </td></tr>
+    <tr><td>-f</td><td>指定sed脚本的文件名</td></tr>
 </table>
 
 > **NOTE:**
@@ -105,25 +105,25 @@ sed命令告诉sed如何处理由地址指定的各输入行，如果没有指�
 在字符后跟上正则表达式，再跟上这个字符即可。例如：sed -n '\o^Myop' datafile
 
 <table class="table">
-	<tr> <th>元字符</th> <th>功能</th> <th>示例</th> </tr>
-	<tr><td>^</td><td>行首定位符 /^my/</td><td>  匹配所有以my开头的行 </td></tr>
-	<tr><td>$</td><td>行尾定位符 /my$/</td><td>  匹配所有以my结尾的行 </td></tr>
-	<tr><td>.</td><td>匹配除换行符以外的单个字符</td><td> /m..y/  匹配包含字母m，后跟两个任意字符，再跟字母y的行 </td></tr>
-	<tr><td>*</td><td>匹配零个或多个前导字符</td><td> /my*/  匹配包含字母m,后跟零个或多个y字母的行 </td></tr>
-	<tr><td>[]</td><td>匹配指定字符组内的任一字符</td><td> /[Mm]y/  匹配包含My或my的行 </td></tr>
-	<tr><td>[^]</td><td>匹配不在指定字符组内的任一字符</td><td> /[^Mm]y/  匹配包含y，但y之前的那个字符不是M或m的行 </td></tr>
-	<tr><td>\(..\)</td><td>保存已匹配的字符</td><td> 1,20s/\(you\)self/\1r/  标记元字符之间的模式，并将其保存为标签1，之后可以使用\1来引用它。最多可以定义9个标签，从左边开始编号，最左边的是第一个。此例中，对第1到第20行进行处理，you被保存为标签1，如果发现youself，则替换为your。 </td></tr>
-	<tr><td>&amp;</td><td>保存查找串以便在替换串中引用</td><td> s/my/**&amp;**/  符号&amp;代表查找串。my将被替换为**my** </td></tr>
-	<tr><td>\&lt;</td><td>词首定位符</td><td> /\&lt;my/  匹配包含以my开头的单词的行 </td></tr>
-	<tr><td>\&gt;</td><td>词尾定位符</td><td> /my\&gt;/  匹配包含以my结尾的单词的行 </td></tr>
-	<tr><td>x\{m\}</td><td>连续m个x</td><td> /9\{5\}/ 匹配包含连续5个9的行 </td></tr>
-	<tr><td>x\{m,\}</td><td>至少m个x</td><td> /9\{5,\}/  匹配包含至少连续5个9的行 </td></tr>
-	<tr><td>x\{m,n\}</td><td>至少m个，但不超过n个x</td><td> /9\{5,7\}/  匹配包含连续5到7个9的行</td></tr>
+    <tr> <th>元字符</th> <th>功能</th> <th>示例</th> </tr>
+    <tr><td>^</td><td>行首定位符 /^my/</td><td>  匹配所有以my开头的行 </td></tr>
+    <tr><td>$</td><td>行尾定位符 /my$/</td><td>  匹配所有以my结尾的行 </td></tr>
+    <tr><td>.</td><td>匹配除换行符以外的单个字符</td><td> /m..y/  匹配包含字母m，后跟两个任意字符，再跟字母y的行 </td></tr>
+    <tr><td>*</td><td>匹配零个或多个前导字符</td><td> /my*/  匹配包含字母m,后跟零个或多个y字母的行 </td></tr>
+    <tr><td>[]</td><td>匹配指定字符组内的任一字符</td><td> /[Mm]y/  匹配包含My或my的行 </td></tr>
+    <tr><td>[^]</td><td>匹配不在指定字符组内的任一字符</td><td> /[^Mm]y/  匹配包含y，但y之前的那个字符不是M或m的行 </td></tr>
+    <tr><td>\(..\)</td><td>保存已匹配的字符</td><td> 1,20s/\(you\)self/\1r/  标记元字符之间的模式，并将其保存为标签1，之后可以使用\1来引用它。最多可以定义9个标签，从左边开始编号，最左边的是第一个。此例中，对第1到第20行进行处理，you被保存为标签1，如果发现youself，则替换为your。 </td></tr>
+    <tr><td>&amp;</td><td>保存查找串以便在替换串中引用</td><td> s/my/**&amp;**/  符号&amp;代表查找串。my将被替换为**my** </td></tr>
+    <tr><td>\&lt;</td><td>词首定位符</td><td> /\&lt;my/  匹配包含以my开头的单词的行 </td></tr>
+    <tr><td>\&gt;</td><td>词尾定位符</td><td> /my\&gt;/  匹配包含以my结尾的单词的行 </td></tr>
+    <tr><td>x\{m\}</td><td>连续m个x</td><td> /9\{5\}/ 匹配包含连续5个9的行 </td></tr>
+    <tr><td>x\{m,\}</td><td>至少m个x</td><td> /9\{5,\}/  匹配包含至少连续5个9的行 </td></tr>
+    <tr><td>x\{m,n\}</td><td>至少m个，但不超过n个x</td><td> /9\{5,7\}/  匹配包含连续5到7个9的行</td></tr>
 </table>
 
 ## 示例
 
-### p 命令
+**p 命令**
 
 命令p用于显示模式空间的内容。**默认情况下，sed把输入行打印在屏幕上**，选项-n用于取消默认的打印操作。
 当选项 `-n` 和命令 `p` **同时** 出现时，sed 可打印选定的内容。
@@ -137,7 +137,7 @@ sed '/my/p' datafile
 sed -n '/my/p' datafile
 {% endhighlight %}
 
-### d 命令
+**d 命令**
 
 命令d用于删除输入行。sed先将输入行从文件复制到模式空间里，然后对该行执行sed命令，
 最后将模式空间里的内容显示在屏幕上。如果发出的是命令d，当前模式空间里的输入行会被删除，不被显示。
@@ -150,7 +150,7 @@ sed '$d' datafile
 sed '/my/d' datafile
 {% endhighlight %}
 
-### s 命令
+**s 命令**
 
 {% highlight bash %}
 # 命令末端的g表示在行内进行全局替换，也就是说如果某行出现多个My，所有的My都被替换为You。
@@ -169,7 +169,7 @@ sed 's#My#Your#g' datafile
 {% endhighlight %}
 
 
-### e 选项
+**e 选项**
 
 `-e` 是编辑命令，用于sed执行**多个**编辑任务的情况下。
 在下一行开始编辑前，所有的编辑动作将应用到模式缓冲区中的行上。
@@ -182,7 +182,7 @@ sed 's#My#Your#g' datafile
 sed -e '1,10d' -e 's/My/Your/g' datafile
 {% endhighlight %}
 
-### r 命令
+**r 命令**
 
 `r` 命令是读命令。sed 使用该命令将一个文本文件中的内容加到当前文件的特定位置上。
 
@@ -192,7 +192,7 @@ sed -e '1,10d' -e 's/My/Your/g' datafile
 sed '/My/r introduce.txt' datafile
 {% endhighlight %}
 
-### w 命令
+**w 命令**
 
 与 `r` 相对的是 `w` 写命令。它将所有匹配的行内容都写到指定的文件中去。
 
@@ -201,7 +201,7 @@ sed '/My/r introduce.txt' datafile
 sed -n '/hrwang/w me.txt' datafile
 {% endhighlight %}
 
-### a/i/c 命令
+**a/i/c 命令**
 
 这三个命令功能相似。
 
@@ -223,7 +223,7 @@ sed '/^some day/a\
 # 用 i 或者 c 替换 a 命令，可以得到不同的效果。不一一举例了。
 {% endhighlight %}
 
-### n 命令
+**n 命令**
 
 sed 使用该命令获取输入文件的下一行，并将其读入到模式缓冲区中，
 任何sed命令都将应用到匹配行紧接着的下一行上。
@@ -237,7 +237,7 @@ sed '/hrwang/{n;s/My/Your/;}' datafile
 > 如果需要使用多条命令，或者需要在某个地址范围内嵌套地址，
 > 就必须用花括号将命令括起来，每行只写一条命令，或这用分号分割同一行中的多条命令。
 
-### y 命令
+**y 命令**
 
 该命令与UNIX/Linux中的tr命令类似，字符按照一对一的方式从左到右进行转换。
 例如，y/abc/ABC/将把所有小写的a转换成A，小写的b转换成B，小写的c转换成C。
@@ -248,7 +248,7 @@ sed '/hrwang/{n;s/My/Your/;}' datafile
 sed '1,20y/hrwang12/HRWANG^$/' datafile
 {% endhighlight %}
 
-### q 命令
+**q 命令**
 
 q命令将导致sed程序退出，不再进行其它的处理。
 
@@ -361,15 +361,272 @@ evans@ubuntu:~$ sed '1!G;h;$!d' demo
 
 ![sed demo](http://blog-codingme.qiniudn.com/linux-sed-2.png)
 
+### 跳转操作 (branch operation)
+
+跳转有类似于 C 语言中的 `goto` 。首先要声明一个标签 (label)，然后根据脚本执行的情况来判断是否跳转到标签处。
+不同的是，sed 中没有 `if` 关键字，判断是否跳转有两种方式：
+
+**无条件跳转**
+
+{% highlight bash %}
+$ sed ':label command(s) b label'
+{% endhighlight %}
+
+* **:label** - 声明标签
+* **commands** - sed 命令
+* **b label** - 无条件跳转。如果没有指定标签 (label)，则跳转至脚本末尾。
+
+**有条件跳转**
+
+{% highlight bash %}
+$ sed ':label command(s) t label'
+{% endhighlight %}
+
+* **:label** - 声明标签
+* **commands** - sed 命令
+* **t label** - 如果最后的一个命令修改了 pattern space 的内容，则跳转到标签处。
+  如果没有指定标签，则跳转至脚本末尾。
+
+> **t label** – jumps to the label only if the last substitute command modified the pattern space. If label is not specified, then jumps to the end of the script.
+
+
 ## 实例
 
-**将文件中的所有行连接成一行**
+以下的用例都是基于该数据文件的操作：
+
+{% highlight bash %}
+evans@ubuntu:~/codebase/demo/sed$ cat thegeekstuff.txt 
+Linux
+        Administration
+        Scripting
+                Tips and Tricks
+Windows
+        Administration
+Database
+        Administration of Oracle
+        Administration of Mysql
+Security
+        Network
+                 Online\
+        Security
+Productivity
+        Google Search\
+        Tips
+        "Web Based Time Tracking,
+        Web Based Todo list and
+        Reduce Key Stores etc"
+{% endhighlight %}
+
+### 例一：替换文件中第一个匹配的模式
+
+{% highlight bash %}
+evans@ubuntu:~/codebase/demo/sed$ sed '/Administration/{
+ s/Administration/Supervision/
+ :loop
+ n
+ b loop
+ }' thegeekstuff.txt
+
+Linux
+        Supervision
+        Scripting
+                Tips and Tricks
+Windows
+        Administration
+Database
+        Administration of Oracle
+        Administration of Mysql
+Security
+        Network
+                 Online\
+        Security
+Productivity
+        Google Search\
+        Tips
+        "Web Based Time Tracking,
+        Web Based Todo list and
+        Reduce Key Stores etc"
+{% endhighlight %}
+
+这段脚本在执行期间主要做了：
+
+1. 将文件中的内容一行一行地读入到 pattern space，然后再输出到终端，**直到**遇见**第一个** Administration ；
+2. 当碰到 Administration 后，将其替换为 Supervision
+3. 当第一个 Administration 被替换后，剩余的脚本则会将文件中所有的数据一行一行地读入到 pattern space 中，然后再打印到终端。
+    * **n** 是一个 sed 命令，它会将当前模式空间中的内容输出到终端，然后用文件的下一行来替换当前模式空间的内容
+    * 在上面的命令中，**loop** 是一个标签，**n** 用于输出和读入，**b** 则跳转至 loop，不断循环，
+      直到将文件中内容全部处理完。
+
+
+### 例二：删除整个文件中所有引号之间的内容
+
+{% highlight bash %}
+evans@ubuntu:~/codebase/demo/sed$ sed -e ':loop
+$!{
+N
+/\n$/!b loop
+}
+s/\"[^\"]*\"//g' thegeekstuff.txt
+Linux
+        Administration
+        Scripting
+                Tips and Tricks
+Windows
+        Administration
+Database
+        Administration of Oracle
+        Administration of Mysql
+Security
+        Network
+                 Online\
+        Security
+Productivity
+        Google Search\
+        Tips
+        
+{% endhighlight %}
+
+1. 上面的命令首先会将文件中的所有数据读入到模式空间
+    - **N!** - 判断是否到达文件的末尾
+    - **N** - 将文件的下一行**添加 (append)**到模式空间末尾，用换行符分隔
+    - **/\n$/!b loop** - 如果不是最后一行，则跳转至 loop 标签处
+2. 现在所有的行都被读入到模式空间（彼此之间由换行符分隔），接着，后续的命令会替换引号之间的内容。
+
+> 在这个例子中，sed 是先将数据全部读入，然后再处理的。
+> 个人觉得，像这种**非流式**的处理过程，其它工具可能更方便一点，因为不需要处理数据读入的过程。
+
+
+### 例三，删除HTML文件中的标签
+
+假设有下面这样一个网页：
+
+{% highlight bash %}
+$ cat index.html
+<html><body>
+<table
+border=2><tr><td valign=top
+align=right>1.</td>
+<td>Line 1 Column 2</
+td>
+</table>
+</body></html>
+{% endhighlight %}
+
+下面的脚本将删除网页文件中的所有标签：
+
+{% highlight bash %}
+$ sed '/</{
+:loop
+s/<[^<]*>//g
+/</{
+N
+b loop
+}
+}' index.html
+
+1.
+Line 1 Column 2
+{% endhighlight %}
+
+1. 如果发现 **<** 符号，则删除该行中所有的标签
+2. 如果标签删除完后，还有 **<**，说明这个标签被分成了多行，我们就继续将下一行读入到
+   模式空间。
+    + 用 **N** 命令，表示将新内容 append 到模式空间。
+    + 删除模式空间中所有的标签，这里使用了全局匹配
+3. 如果 **<** 没有了，则打出模式空间中的数据；如果还有，则继续 2 的步骤。
+
+
+### 例四，连接用反斜杠结束的行
+
+如果文件中某些行是用反斜杠 (\\) 结尾的，则将该行与下一行连接起来。
+
+{% highlight bash %}
+$ sed '
+:loop
+/\\$/N
+s/\\\n */ /
+t loop' thegeekstuff.txt
+Linux
+        Administration
+        Scripting
+                Tips and Tricks
+Windows
+        Administration
+Database
+        Administration of Oracle
+        Administration of Mysql
+Security
+        Network
+                 Online Security
+Productivity
+        Google Search Tips
+        "Web Based Time Tracking,
+        Web Based Todo list and
+        Reduce Key Stores etc"
+{% endhighlight %}
+
+1. **/\\\\$/** 检查行是否是以反斜杠结尾。如果是，则读入下一行，并将**第一个**反斜杠替换为空格。
+2. 如果替换成功，则开始循环 1 （查看当前行是否仍以反斜杠结尾）
+3. 如果没有了，则输出循环。输出当前模式空间的内容，接着读入下一行，从头开始 1 的过程。
+
+### 例五，分隔一窜数字
+
+{% highlight bash %}
+sed '
+:loop
+s/\(.*[0-9]\)\([0-9]\{3\}\)/\1,\2/
+t loop'
+12342342342343434
+12,342,342,342,343,434
+{% endhighlight %}
+
+1. 在第一次匹配中，将数字窜分为两组，第一组是一窜数字，第二组是末尾的3个。
+   在替换操作中将这两组数据用逗号隔开。
+2. 重复1中的数据，注意，此时模式空间的内容已经改变。因此第二次匹配是，最后面的逗号，
+   以及逗号后数字将无法匹配成功，因此只处理开头部分的一窜。
+3. 反复循环，直到剩余的数字窜不足三个。
+
+### 例六，将开头的空格全部替换为 **+** 号
+
+{% highlight bash %}
+$ sed '
+s/^ */&\n/
+:loop
+s/^\n//;s/ \n/\n+/
+t loop' test
+Linux
+++++++++Administration
+++++++++Scripting
+++++++++++++++++Tips and Tricks
+Windows
+++++++++Administration
+Database
+++++++++Administration of Oracle
+++++++++Administration of Mysql
+Security
+++++++++Network
++++++++++++++++++Online\
+++++++++Security
+Productivity
+++++++++Google Search\
+++++++++Tips
+++++++++"Web Based Time Tracking,
+++++++++Web Based Todo list and
+++++++++Reduce Key Stores etc"
+{% endhighlight %}
+
+1. 先将开头的空格字符与其它字符用换行符分隔开
+2. 将 **空格与换行符** 替换为 **换行符与+**。那么从右到左，空格将被替换为**+**，
+   换行符则移动到了最前面。
+3. 最后，换行符将会在最前面，删掉它即可。
+
+> 是一个巧妙的用法，很有意思。
+
+### 例七，将文件中的所有行连接成一行
 
 {% highlight bash %}
 # option 1 with sed
 sed -e :a -e '$!N; s/\n/ /; ta' current.txt
-
-# :a is a label, how to use label in sed?
 
 # option 2 with tr
 tr '\n' ' ' < input_filename
@@ -381,3 +638,4 @@ tr '\n' ' ' < input_filename
 > 
 > * [sed命令详解](http://www.cnblogs.com/edwardlost/archive/2010/09/17/1829145.html)
 > * [sed之G、H、g、h使用](http://www.cnblogs.com/fhefh/archive/2011/11/22/2259097.html)
+> * [Unix Sed Tutorial: 6 Examples for Sed Branching Operation](http://www.thegeekstuff.com/2009/12/unix-sed-tutorial-6-examples-for-sed-branching-operation/)
