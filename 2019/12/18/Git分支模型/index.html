@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=PingFang SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://blog.lemoon.fun').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="规范：Git分支管理 分支模型 总览 代码是研发部门最重要的资产，维护和管理代码分支结构，是资产安全管理和研发&#x2F;测试&#x2F;运维协作中非常重要的事情！本文介绍的内容是Git常用的单主分支模型流程。  分支模型演进图：  从上图可以看到主要包含下面几个分支：   * master: 主分支，主要用来版本发布。  * develop：日常开发分支，该分支正常保存了开发的最新代码。  * feature：从d">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git分支模型">
+<meta property="og:url" content="https:&#x2F;&#x2F;blog.lemoon.fun&#x2F;2019&#x2F;12&#x2F;18&#x2F;Git%E5%88%86%E6%94%AF%E6%A8%A1%E5%9E%8B&#x2F;">
+<meta property="og:site_name" content="明远">
+<meta property="og:description" content="规范：Git分支管理 分支模型 总览 代码是研发部门最重要的资产，维护和管理代码分支结构，是资产安全管理和研发&#x2F;测试&#x2F;运维协作中非常重要的事情！本文介绍的内容是Git常用的单主分支模型流程。  分支模型演进图：  从上图可以看到主要包含下面几个分支：   * master: 主分支，主要用来版本发布。  * develop：日常开发分支，该分支正常保存了开发的最新代码。  * feature：从d">
+<meta property="og:locale" content="zh">
+<meta property="og:image" content="https:&#x2F;&#x2F;blog.lemoon.fun&#x2F;2019&#x2F;12&#x2F;18&#x2F;Git%E5%88%86%E6%94%AF%E6%A8%A1%E5%9E%8B&#x2F;1.png">
+<meta property="article:published_time" content="2019-12-18T06:28:12.000Z">
+<meta property="article:modified_time" content="2019-12-18T06:32:08.934Z">
+<meta property="article:author" content="Evans Yang">
+<meta property="article:tag" content="开发">
+<meta property="article:tag" content="git">
+<meta property="article:tag" content="效率">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;blog.lemoon.fun&#x2F;2019&#x2F;12&#x2F;18&#x2F;Git%E5%88%86%E6%94%AF%E6%A8%A1%E5%9E%8B&#x2F;1.png">
+
+<link rel="canonical" href="https://blog.lemoon.fun/2019/12/18/Git%E5%88%86%E6%94%AF%E6%A8%A1%E5%9E%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>Git分支模型 | 明远</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">明远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">答非所问</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://blog.lemoon.fun/2019/12/18/Git%E5%88%86%E6%94%AF%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Evans Yang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="明远">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Git分支模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2019-12-18 14:28:12 / Modified: 14:32:08" itemprop="dateCreated datePublished" datetime="2019-12-18T14:28:12+08:00">2019-12-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91/" itemprop="url" rel="index">
+                    <span itemprop="name">开发</span>
+                  </a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91/%E8%A7%84%E8%8C%83/" itemprop="url" rel="index">
+                    <span itemprop="name">规范</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="规范：Git分支管理"><a href="#规范：Git分支管理" class="headerlink" title="规范：Git分支管理"></a>规范：Git分支管理</h1><h1 id="分支模型"><a href="#分支模型" class="headerlink" title="分支模型"></a>分支模型</h1><h2 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h2><p>代码是研发部门最重要的资产，维护和管理代码分支结构，是资产安全管理和研发/测试/运维协作中非常重要的事情！本文介绍的内容是Git常用的单主分支模型流程。</p>
+<p>分支模型演进图：</p>
+<img src="/2019/12/18/Git%E5%88%86%E6%94%AF%E6%A8%A1%E5%9E%8B/1.png" class="" title="分支模型">
+
+<p>从上图可以看到主要包含下面几个分支：</p>
+<ul>
+<li>master: 主分支，主要用来版本发布。</li>
+<li>develop：日常开发分支，该分支正常保存了开发的最新代码。</li>
+<li>feature：从develop分支fork，合并回develop。具体的功能开发分支。该分支的命名可以使用任务编号的格式。比如，对任务XD-01，可以创建 feature-XD-01 的分支用于开发和跟进。</li>
+<li>release：从develop分支fork，合并回develop和master。一般用于发布正式版本之前（即合并到 master 分支之前），需要有的预发布的版本进行测试。</li>
+<li>hotfix：从master分支fork，合并回develop和master。线上 bug 修复分支。该分支的命名方式和 feature 分支类似。</li>
+</ul>
+<h2 id="主分支-master-develop"><a href="#主分支-master-develop" class="headerlink" title="主分支(master, develop)"></a>主分支(master, develop)</h2><p>主分支包括 master 分支和 develop 分支。master 分支用来发布，HEAD 就是当前线上的运行代码。develop 分支就是我们的日常开发。使用这两个分支就具有了最简单的开发模式：develop 分支用来开发功能，开发完成并且测试没有问题则将 develop 分支的代码合并到 master 分支并发布。</p>
+<h2 id="辅助分支-feature-release-hotfix"><a href="#辅助分支-feature-release-hotfix" class="headerlink" title="辅助分支(feature , release, hotfix)"></a>辅助分支(feature , release, hotfix)</h2><p>feature 分支用来开发具体的功能，一般 fork 自 develop 分支，最终可能会合并到 develop 分支。一般feature分支都存在于开发者本地，开发期间使用git rebase来保证和develop分支的代码同步并解决冲突。功能开发完毕后push到远程仓库，然后提交pull request，合并到develop分支。</p>
+<p>release 分支是 pre-master。release 分支从 develop 分支 fork 出来，最终会合并到 develop 分支和 master 分支。合并到 master 分支上就是可以发布的代码了。有人可能会问那为什么合并回 develop 分支呢？很简单，有了 release 分支，那么相关的代码修复就只会在 release 分支上改动了，最后必然要合并到 develop 分支。比如，当开发一个较长期的feature不着急上线但又需要部署测试时，可以从develop分出一个release分支，feature提交pull request到这个release分支，然后部署这个release分支到测试服。</p>
+<p>hotfix 分支用来修复线上 bug。当线上代码出现 bug 时，我们基于 master 分支开一个 hotfix 分支，修复 bug 之后再将 hotfix 分支合并到 master 分支并进行发布，同时 develop 分支作为最新最全的代码分支，hotfix 分支也需要合并到 develop 分支上去。</p>
+<h2 id="分支命名"><a href="#分支命名" class="headerlink" title="分支命名"></a>分支命名</h2><p>除了主要分支的名字是固定的之外，派生分支是需要自己命名的，这里就要有个命名规范了。强烈推荐用如下形式：</p>
+<ul>
+<li>master 主分支，发布分支</li>
+<li>dev 主分支，开发分支</li>
+<li>feat_xxx——按照功能点（而不是需求）命名；</li>
+<li>release_xxx——用发布时间命名，可以加上适当的前缀；</li>
+<li>hotfix_xxx——GitLab 的 issue 编号或 bug 性质等。</li>
+</ul>
+<p>小写字母下划线形式</p>
+<h2 id="版本号命名"><a href="#版本号命名" class="headerlink" title="版本号命名"></a>版本号命名</h2><p>格式为：x.y.z，其中，x 用于有重大重构时才会升级，y 用于有新的特性发布时才会升级，z 用于修改了某个 bug 后才会升级。</p>
+<p>v1.1.1：第一位大版本号，大功能发布时增加，技术负责人审核；第二位小版本号，增加小特性时增加，主开发审核；第三位BUG修复号，修复BUG用，修复人员负责。</p>
+<p>每次发布生产(master)，需要为master打一个tag，方便线上回滚</p>
+<h1 id="开发规范"><a href="#开发规范" class="headerlink" title="开发规范"></a>开发规范</h1><h2 id="Commit原则"><a href="#Commit原则" class="headerlink" title="Commit原则"></a>Commit原则</h2><p>只要坚持做到以下几点就 OK 了：</p>
+<ol>
+<li>提交时的粒度是一个小功能点或者一个 bug fix，这样进行恢复等的操作时能够将「误伤」减到最低；<ol>
+<li>用一句简练的话写在第一行，然后空一行稍微详细阐述该提交所增加或修改的地方；</li>
+<li>不要每提交一次就推送一次，多积攒几个提交后一次性推送，这样可以避免在进行一次提交后发现代码中还有小错误。</li>
+</ol>
+</li>
+<li>Commit Message 格式（该格式要求大家严格遵守！！！）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;type&gt;(&lt;scope&gt;): &lt;subject&gt; （不超过50个字）</span><br><span class="line"></span><br><span class="line">&lt;空行&gt;</span><br><span class="line"></span><br><span class="line">&lt;body&gt; （每行不超过72个字）</span><br><span class="line"></span><br><span class="line">&lt;空行&gt;</span><br><span class="line"></span><br><span class="line">&lt;footer&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>type</code> 变更类型<ul>
+<li>feat：新功能（feature）</li>
+<li>fix：修补bug</li>
+<li>mod：修改（即不是新增功能，也不是修改bug的代码变动）</li>
+<li>refactor：重构</li>
+<li>docs：文档（documentation）</li>
+<li>style： 格式（不影响代码运行的变动）</li>
+<li>test：增加测试</li>
+<li>chore：构建过程或辅助工具的变动</li>
+</ul>
+</li>
+<li><code>scope</code> 用来说明本次Commit影响的范围，即简要说明修改会涉及的部分。这个本来是选填项，但从AngularJS实际项目中可以看出基本上也成了必填项了。</li>
+<li><code>subject</code> 主题摘要，用来简要描述本次改动，概述就好了，因为后面还会在Body里给出具体信息。并且最好遵循下面三条:<ul>
+<li>以动词开头，使用第一人称现在时，比如change，而不是changed或changes</li>
+<li>首字母不要大写</li>
+<li>结尾不用句号(.)</li>
+</ul>
+</li>
+<li><code>Body</code> 修改内容详述，这里的内容是对上面subject里内容的展开，在此做更加详尽的描述，内容里应该包含修改动机和修改前后的对比。</li>
+<li><code>Footer</code> footer里的主要放置不兼容变更和Issue关闭的信息</li>
+<li><code>Revert（可选）</code>此外如果需要撤销之前的Commit，那么本次Commit Message中必须以revert：开头，后面紧跟前面描述的Header部分，格式不变。并且，Body部分的格式也是固定的，必须要记录撤销前Commit的SHA值。</li>
+</ul>
+<p>参考示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">feat: 增加港股经纪商队列</span><br><span class="line"></span><br><span class="line">增加港股经纪商队列接口和后台名称编辑接口</span><br><span class="line">增加同时获取买卖盘和经纪商的接口</span><br><span class="line"></span><br><span class="line">BREAKING CHANGE: 删除了旧版十档买卖盘接口</span><br></pre></td></tr></table></figure>
+
+<p>————————————————<br>本文参考转载：<a href="https://blog.csdn.net/leel0330/article/details/80415859" target="_blank" rel="noopener">https://blog.csdn.net/leel0330/article/details/80415859</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%80%E5%8F%91/" rel="tag"># 开发</a>
+              <a href="/tags/git/" rel="tag"># git</a>
+              <a href="/tags/%E6%95%88%E7%8E%87/" rel="tag"># 效率</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/18/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8D%81%E4%BA%8C%E8%A6%81%E7%B4%A0/" rel="prev" title="微服务十二要素">
+      <i class="fa fa-chevron-left"></i> 微服务十二要素
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/18/%E9%A1%B9%E7%9B%AE%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B%E6%80%BB%E8%A7%88/" rel="next" title="项目开发流程总览">
+      项目开发流程总览 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#规范：Git分支管理"><span class="nav-number">1.</span> <span class="nav-text">规范：Git分支管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分支模型"><span class="nav-number">2.</span> <span class="nav-text">分支模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#总览"><span class="nav-number">2.1.</span> <span class="nav-text">总览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主分支-master-develop"><span class="nav-number">2.2.</span> <span class="nav-text">主分支(master, develop)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#辅助分支-feature-release-hotfix"><span class="nav-number">2.3.</span> <span class="nav-text">辅助分支(feature , release, hotfix)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分支命名"><span class="nav-number">2.4.</span> <span class="nav-text">分支命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本号命名"><span class="nav-number">2.5.</span> <span class="nav-text">版本号命名</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#开发规范"><span class="nav-number">3.</span> <span class="nav-text">开发规范</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Commit原则"><span class="nav-number">3.1.</span> <span class="nav-text">Commit原则</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Evans Yang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ytfei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ytfei" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Evans Yang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.1.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

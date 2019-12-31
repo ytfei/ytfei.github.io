@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=PingFang SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://blog.lemoon.fun').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="清单：代码评审 开发人员代码提交评审前，请参考该规范提前自查。  准备 代码提交评审前，请先适当整理：   1. 代码规范请参考 阿里巴巴Java开发.pdf  2. 格式化代码（保持代码风格统一）  3. 使用 IDEA Alibaba Coding Guidelines Analyze 工具对代码进行扫描，并对发现的问题进行处理  评审 评审的内容除了参考执行 阿里巴巴Java开发.pdf 以">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码评审">
+<meta property="og:url" content="https:&#x2F;&#x2F;blog.lemoon.fun&#x2F;2019&#x2F;12&#x2F;18&#x2F;%E4%BB%A3%E7%A0%81%E8%AF%84%E5%AE%A1&#x2F;">
+<meta property="og:site_name" content="明远">
+<meta property="og:description" content="清单：代码评审 开发人员代码提交评审前，请参考该规范提前自查。  准备 代码提交评审前，请先适当整理：   1. 代码规范请参考 阿里巴巴Java开发.pdf  2. 格式化代码（保持代码风格统一）  3. 使用 IDEA Alibaba Coding Guidelines Analyze 工具对代码进行扫描，并对发现的问题进行处理  评审 评审的内容除了参考执行 阿里巴巴Java开发.pdf 以">
+<meta property="og:locale" content="zh">
+<meta property="article:published_time" content="2019-12-18T06:08:58.000Z">
+<meta property="article:modified_time" content="2019-12-18T06:16:19.439Z">
+<meta property="article:author" content="Evans Yang">
+<meta property="article:tag" content="开发">
+<meta property="article:tag" content="编程">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://blog.lemoon.fun/2019/12/18/%E4%BB%A3%E7%A0%81%E8%AF%84%E5%AE%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>代码评审 | 明远</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">明远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">答非所问</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://blog.lemoon.fun/2019/12/18/%E4%BB%A3%E7%A0%81%E8%AF%84%E5%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Evans Yang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="明远">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          代码评审
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2019-12-18 14:08:58 / Modified: 14:16:19" itemprop="dateCreated datePublished" datetime="2019-12-18T14:08:58+08:00">2019-12-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91/" itemprop="url" rel="index">
+                    <span itemprop="name">开发</span>
+                  </a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91/%E6%B8%85%E5%8D%95/" itemprop="url" rel="index">
+                    <span itemprop="name">清单</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="清单：代码评审"><a href="#清单：代码评审" class="headerlink" title="清单：代码评审"></a>清单：代码评审</h1><blockquote>
+<p>开发人员代码提交评审前，请参考该规范提前自查。</p>
+</blockquote>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><p>代码提交评审前，请先适当整理：</p>
+<ol>
+<li>代码规范请参考 <a href="/2019/12/18/%E4%BB%A3%E7%A0%81%E8%AF%84%E5%AE%A1/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4Java%E5%BC%80%E5%8F%91.pdf" title="阿里巴巴Java开发.pdf">阿里巴巴Java开发.pdf</a></li>
+<li>格式化代码（保持代码风格统一）</li>
+<li>使用 IDEA Alibaba Coding Guidelines Analyze 工具对代码进行扫描，并对发现的问题进行处理</li>
+</ol>
+<h3 id="评审"><a href="#评审" class="headerlink" title="评审"></a>评审</h3><p>评审的内容除了参考执行 <a href="/2019/12/18/%E4%BB%A3%E7%A0%81%E8%AF%84%E5%AE%A1/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4Java%E5%BC%80%E5%8F%91.pdf" title="阿里巴巴Java开发.pdf">阿里巴巴Java开发.pdf</a> 以外，还需要从以下几个方面考虑：</p>
+<ol>
+<li>模块设计<ol>
+<li>功能性<ol>
+<li>描述功能被使用的角色&amp;场景</li>
+<li>描述功能要解决的主要问题</li>
+<li>业务流程说明</li>
+<li>数据库表结构及核心业务状态</li>
+</ol>
+</li>
+<li>非功能性<ol>
+<li>性能：场景对性能（时延、吞吐量）的要求</li>
+<li>扩展性：场景是否存在多个备选项</li>
+<li>幂等性：重复性操作是如何处理</li>
+<li>安全性：</li>
+<li>权限、数据隐私（是否脱敏或者加密）</li>
+<li>三方资源（付费，如短信等）保护，防止被刷</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>代码实现<ol>
+<li>检查是否遵守了 <a href="/2019/12/18/%E4%BB%A3%E7%A0%81%E8%AF%84%E5%AE%A1/%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4Java%E5%BC%80%E5%8F%91.pdf" title="阿里巴巴Java开发.pdf">阿里巴巴Java开发.pdf</a></li>
+<li>代码方案实现的整体模式</li>
+<li>代码注释、变量、函数命名是否清晰易懂</li>
+<li>代码日志能否清晰描述业务过程<ol>
+<li>日志级别是否正确</li>
+<li>日志内容要恰当，既不能模糊，也不能事无巨细的全部写在日志</li>
+<li>日志中不能包含隐私内容</li>
+</ol>
+</li>
+<li>异常处理过程<ol>
+<li>不允许捕获异常而不做处理（捕获异常记录日志，也是一种不处理的情况，要注释说明原因）</li>
+<li>捕获异常是否会影响正常的流程</li>
+<li>捕获异常时，是否需要重试，或者检查业务状态？</li>
+</ol>
+</li>
+<li>多线程<ol>
+<li>是否使用线程池，线程池的生命周期，队列的长度，现成的数量</li>
+<li>线程任务是否有依赖性，线程任务的执行时间是否会过程</li>
+<li>线程池能否关闭、何时关闭</li>
+</ol>
+</li>
+<li>锁（本地锁和分布式锁）<ol>
+<li>为什么需要使用锁，说明原因</li>
+<li>锁的获取与释放</li>
+<li>锁超时的设置</li>
+<li>任务之间是否存在死锁的可能性</li>
+<li>锁是否可能成为全局的瓶颈</li>
+<li>有没有不用锁的替代方案</li>
+</ol>
+</li>
+<li>数据库事务<ol>
+<li>说明使用数据库事务的原因</li>
+<li>事务失败会产生什么影响</li>
+<li>事务是否需要分拆，避免事务过大</li>
+<li>是否对事务的有效性做过验证（声明式事务配置不当可能不会生效）</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>升级部署<ol>
+<li>兼容性<ol>
+<li>是否有数据库变更</li>
+<li>是否有配置文件变更</li>
+<li>是否需要停服发布</li>
+</ol>
+</li>
+<li>能否回滚<ol>
+<li>是否有回滚预案，风险是什么</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%80%E5%8F%91/" rel="tag"># 开发</a>
+              <a href="/tags/%E7%BC%96%E7%A8%8B/" rel="tag"># 编程</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/18/%E7%A0%94%E5%8F%91%E6%B5%81%E7%A8%8B/" rel="prev" title="研发流程">
+      <i class="fa fa-chevron-left"></i> 研发流程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/18/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E5%8D%81%E4%BA%8C%E8%A6%81%E7%B4%A0/" rel="next" title="微服务十二要素">
+      微服务十二要素 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#清单：代码评审"><span class="nav-number">1.</span> <span class="nav-text">清单：代码评审</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备"><span class="nav-number">1.0.1.</span> <span class="nav-text">准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#评审"><span class="nav-number">1.0.2.</span> <span class="nav-text">评审</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Evans Yang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ytfei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ytfei" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Evans Yang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.1.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

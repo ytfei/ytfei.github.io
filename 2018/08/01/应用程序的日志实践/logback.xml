@@ -1,0 +1,34 @@
+<configuration>
+    <springProperty scope="context" name="app_name" source="spring.application.name"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <jmxConfigurator/>
+
+    <appender name="appLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>@logging.path@/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>@logging.path@/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>1024MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd} %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="appLog"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <springProfile name="dev">
+    </springProfile>
+
+    <springProfile name="prod">
+    </springProfile>
+
+    <springProfile name="test">
+    </springProfile>
+</configuration>
