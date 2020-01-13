@@ -3,23 +3,23 @@
 
 
     <sitemap>
-        <loc>https://blog.lemoon.fun/post-sitemap.xml</loc>
-        <lastmod>2019-12-31T03:46:12.369Z</lastmod>
+        <loc>https://www.lemoon.fun/post-sitemap.xml</loc>
+        <lastmod>2020-01-13T04:34:25.387Z</lastmod>
     </sitemap>
 
     <sitemap>
-        <loc>https://blog.lemoon.fun/page-sitemap.xml</loc>
+        <loc>https://www.lemoon.fun/page-sitemap.xml</loc>
         <lastmod>2019-12-18T08:37:15.308Z</lastmod>
     </sitemap>
 
     <sitemap>
-        <loc>https://blog.lemoon.fun/category-sitemap.xml</loc>
-        <lastmod>2019-12-31T03:46:12.369Z</lastmod>
+        <loc>https://www.lemoon.fun/category-sitemap.xml</loc>
+        <lastmod>2020-01-13T04:34:25.387Z</lastmod>
     </sitemap>
 
     <sitemap>
-        <loc>https://blog.lemoon.fun/tag-sitemap.xml</loc>
-        <lastmod>2019-12-31T03:46:12.369Z</lastmod>
+        <loc>https://www.lemoon.fun/tag-sitemap.xml</loc>
+        <lastmod>2020-01-13T04:34:25.387Z</lastmod>
     </sitemap>
 
 </sitemapindex>

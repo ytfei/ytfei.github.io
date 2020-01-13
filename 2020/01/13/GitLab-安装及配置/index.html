@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=PingFang SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://www.lemoon.fun').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="使用 Docker 安装GitLab 服务。  环境： Linux, 内存至少4G，GitLab的Docker容器是全栈的，包含了数据库、缓存及应用，全家桶对内存有一定的要求。  以下以 CentOS 7 为例安装，Ubuntu 差别不大。  安装Docker 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16   # 安装 yum install docker.x86_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GitLab 安装及配置">
+<meta property="og:url" content="https:&#x2F;&#x2F;www.lemoon.fun&#x2F;2020&#x2F;01&#x2F;13&#x2F;GitLab-%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE&#x2F;">
+<meta property="og:site_name" content="明远">
+<meta property="og:description" content="使用 Docker 安装GitLab 服务。  环境： Linux, 内存至少4G，GitLab的Docker容器是全栈的，包含了数据库、缓存及应用，全家桶对内存有一定的要求。  以下以 CentOS 7 为例安装，Ubuntu 差别不大。  安装Docker 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16   # 安装 yum install docker.x86_">
+<meta property="og:locale" content="zh">
+<meta property="article:published_time" content="2020-01-13T03:30:17.000Z">
+<meta property="article:modified_time" content="2020-01-13T04:34:25.387Z">
+<meta property="article:author" content="Evans Yang">
+<meta property="article:tag" content="开发">
+<meta property="article:tag" content="效率">
+<meta property="article:tag" content="工具">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.lemoon.fun/2020/01/13/GitLab-%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>GitLab 安装及配置 | 明远</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">明远</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">答非所问</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh">
+    <link itemprop="mainEntityOfPage" href="https://www.lemoon.fun/2020/01/13/GitLab-%E5%AE%89%E8%A3%85%E5%8F%8A%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Evans Yang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="明远">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GitLab 安装及配置
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-01-13 11:30:17 / Modified: 12:34:25" itemprop="dateCreated datePublished" datetime="2020-01-13T11:30:17+08:00">2020-01-13</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91/" itemprop="url" rel="index">
+                    <span itemprop="name">开发</span>
+                  </a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BC%80%E5%8F%91/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
+                    <span itemprop="name">工具</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>使用 Docker 安装GitLab 服务。</p>
+<blockquote>
+<p>环境：<br>Linux, 内存至少4G，GitLab的Docker容器是全栈的，包含了数据库、缓存及应用，全家桶对内存有一定的要求。</p>
+</blockquote>
+<p>以下以 CentOS 7 为例安装，Ubuntu 差别不大。</p>
+<h1 id="安装Docker"><a href="#安装Docker" class="headerlink" title="安装Docker"></a>安装Docker</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装</span></span><br><span class="line">yum install docker.x86_64</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置镜像（阿里云容器镜像）</span></span><br><span class="line">sudo mkdir -p /etc/docker</span><br><span class="line">sudo tee /etc/docker/daemon.json &lt;&lt;-<span class="string">'EOF'</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"registry-mirrors"</span>: [<span class="string">"https://ooudbzrj.mirror.aliyuncs.com"</span>]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重启服务，使镜像配置生效</span></span><br><span class="line">service docker restart</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看镜像配置</span></span><br><span class="line">docker info | grep -A 1 <span class="string">"Registry Mirrors"</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="安装GitLab"><a href="#安装GitLab" class="headerlink" title="安装GitLab"></a>安装GitLab</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /opt/gitlab/etc /opt/gitlab/<span class="built_in">log</span> /opt/gitlab/opt</span><br><span class="line"></span><br><span class="line">sudo docker run --detach \</span><br><span class="line">        -p 8443:443 \</span><br><span class="line">        -p 8480:80 \</span><br><span class="line">        -p 10022:22 \</span><br><span class="line">        --name gitlab \</span><br><span class="line">        --volume /opt/gitlab/etc:/etc/gitlab \</span><br><span class="line">        --volume /opt/gitlab/<span class="built_in">log</span>:/var/<span class="built_in">log</span>/gitlab \</span><br><span class="line">        --volume /opt/gitlab/opt:/var/opt/gitlab \</span><br><span class="line">        -v /etc/localtime:/etc/localtime \</span><br><span class="line">        --restart=unless-stopped \</span><br><span class="line">        gitlab/gitlab-ce</span><br><span class="line"></span><br><span class="line"><span class="comment"># 由于 docker 容器中的服务内容比较多，启动到就绪大概要1分钟</span></span><br><span class="line"><span class="comment"># 查看容器状态</span></span><br><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+
+<p>启动完成后，可以直接通过 “IP:8480” 访问容器。</p>
+<blockquote>
+<p>第一次访问会提示设置密码，默认的用户名是 <code>root</code> 。</p>
+</blockquote>
+<h2 id="配置GitLab"><a href="#配置GitLab" class="headerlink" title="配置GitLab"></a>配置GitLab</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 从主机连接到容器</span></span><br><span class="line">docker <span class="built_in">exec</span> -it gitlab bash</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改gitlab.rb配置文件</span></span><br><span class="line">vim /etc/gitlab.rb <span class="comment"># 编辑gitlab.rb文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment">####### 以下是文件中需要修改的内容 START ############</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## GitLab NGINX</span></span><br><span class="line">nginx[<span class="string">'listen_port'</span>] = 80  <span class="comment"># gitlab nginx 端口。默认端口为：80 </span></span><br><span class="line"></span><br><span class="line"><span class="comment">## GitLab Unicorn</span></span><br><span class="line">unicorn[<span class="string">'listen'</span>] = <span class="string">'localhost'</span></span><br><span class="line">unicorn[<span class="string">'port'</span>] = 8080 <span class="comment">#默认是8080端口</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## GitLab URL 配置http协议所使用的访问地址</span></span><br><span class="line">external_url <span class="string">'http://code.lemoon.fun'</span> <span class="comment"># clone时显示的地址，gitlab 的域名</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置ssh协议所使用的访问地址和端口</span></span><br><span class="line">gitlab_rails[<span class="string">'gitlab_ssh_host'</span>] = <span class="string">'code.lemoon.fun'</span></span><br><span class="line">gitlab_rails[<span class="string">'gitlab_shell_ssh_port'</span>] = 10022</span><br><span class="line"></span><br><span class="line"><span class="comment">####### 文件中需要修改的内容 END ############</span></span><br></pre></td></tr></table></figure>
+
+<p>修改好配置文件后，重启 <code>docker restart gitlab</code> 。</p>
+<blockquote>
+<p>由于启动的时候设置磁盘共享了，用户也可以直接编辑 <code>/opt/gitlab/etc/gitlab.rb</code> 。</p>
+</blockquote>
+<h2 id="配置Nginx代理"><a href="#配置Nginx代理" class="headerlink" title="配置Nginx代理"></a>配置Nginx代理</h2><p>服务启动后，配合正式的域名。使用 Nginx 作为反向代理。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">yum install nginx</span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> &gt; /etc/nginx/conf.d/gitlab.rb &lt;&lt;EOF</span><br><span class="line">upstream gitlab_http &#123;</span><br><span class="line">     server 127.0.0.1:8480 weight=10;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">   server_name code.lemoon.fun;</span><br><span class="line">   root html;</span><br><span class="line">   access_log  <span class="string">"/var/log/nginx/gitlab.access.log"</span>  main;</span><br><span class="line">   error_log  <span class="string">"/var/log/nginx/gitlab.error.log"</span>;</span><br><span class="line">   index  index.html index.htm index.php;</span><br><span class="line">   location / &#123;</span><br><span class="line">       proxy_pass  http://gitlab_http;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   listen 80;</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTPS-配置"><a href="#HTTPS-配置" class="headerlink" title="HTTPS 配置"></a>HTTPS 配置</h2><p>使用 certbot 配置域名。参考<a href="https://certbot.eff.org/" target="_blank" rel="noopener">官方文档</a>即可！</p>
+<p>如果 certbot 在CentOS 上运行有问题，可以先</p>
+<ul>
+<li>安装 <a href="https://github.com/pyenv/pyenv" target="_blank" rel="noopener">PyEnv</a></li>
+<li>pyenv install 2.7.17</li>
+<li>pip install certbot certbot-nginx</li>
+</ul>
+<p>然后再执行 certbot 即可！</p>
+<p>参考文档 <a href="https://segmentfault.com/a/1190000019019854?utm_source=tag-newest" target="_blank" rel="noopener">Docker搭建GitLab</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%80%E5%8F%91/" rel="tag"># 开发</a>
+              <a href="/tags/%E6%95%88%E7%8E%87/" rel="tag"># 效率</a>
+              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"># 工具</a>
+              <a href="/tags/docker/" rel="tag"># docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/31/%E7%B1%B3%E7%AD%90RQAlpha%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/" rel="prev" title="米筐RQAlpha环境安装">
+      <i class="fa fa-chevron-left"></i> 米筐RQAlpha环境安装
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装Docker"><span class="nav-number">1.</span> <span class="nav-text">安装Docker</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装GitLab"><span class="nav-number">2.</span> <span class="nav-text">安装GitLab</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置GitLab"><span class="nav-number">2.1.</span> <span class="nav-text">配置GitLab</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Nginx代理"><span class="nav-number">2.2.</span> <span class="nav-text">配置Nginx代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTPS-配置"><span class="nav-number">2.3.</span> <span class="nav-text">HTTPS 配置</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Evans Yang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ytfei" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ytfei" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Evans Yang</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.1.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

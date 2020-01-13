@@ -2,69 +2,76 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <url>
-        <loc>https://blog.lemoon.fun</loc>
+        <loc>https://www.lemoon.fun</loc>
         <changefreq>daily</changefreq>
         <priority>1</priority>
     </url>
 
     <url>
-        <loc>https://blog.lemoon.fun/categories/%25E6%258A%2595%25E8%25B5%2584/%25E9%2587%258F%25E5%258C%2596%25E4%25BA%25A4%25E6%2598%2593/</loc>
+        <loc>https://www.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E5%25B7%25A5%25E5%2585%25B7/</loc>
+        <lastmod>2020-01-13T04:34:25.387Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/</loc>
+        <lastmod>2020-01-13T04:34:25.387Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.lemoon.fun/categories/%25E6%258A%2595%25E8%25B5%2584/%25E9%2587%258F%25E5%258C%2596%25E4%25BA%25A4%25E6%2598%2593/</loc>
         <lastmod>2019-12-31T03:46:12.369Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://blog.lemoon.fun/categories/%25E6%258A%2595%25E8%25B5%2584/</loc>
+        <loc>https://www.lemoon.fun/categories/%25E6%258A%2595%25E8%25B5%2584/</loc>
         <lastmod>2019-12-31T03:46:12.369Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://blog.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E6%258A%2580%25E6%259C%25AF/</loc>
+        <loc>https://www.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E6%258A%2580%25E6%259C%25AF/</loc>
         <lastmod>2019-12-31T03:46:12.337Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://blog.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/</loc>
-        <lastmod>2019-12-31T03:46:12.337Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://blog.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E6%25B5%2581%25E7%25A8%258B/</loc>
+        <loc>https://www.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E6%25B5%2581%25E7%25A8%258B/</loc>
         <lastmod>2019-12-18T06:39:24.253Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://blog.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E8%25A7%2584%25E8%258C%2583/</loc>
+        <loc>https://www.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E8%25A7%2584%25E8%258C%2583/</loc>
         <lastmod>2019-12-18T06:32:08.934Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://blog.lemoon.fun/categories/%25E7%25A0%2594%25E5%258F%2591/%25E8%25A7%2584%25E8%258C%2583/</loc>
+        <loc>https://www.lemoon.fun/categories/%25E7%25A0%2594%25E5%258F%2591/%25E8%25A7%2584%25E8%258C%2583/</loc>
         <lastmod>2019-12-18T06:27:05.143Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://blog.lemoon.fun/categories/%25E7%25A0%2594%25E5%258F%2591/</loc>
+        <loc>https://www.lemoon.fun/categories/%25E7%25A0%2594%25E5%258F%2591/</loc>
         <lastmod>2019-12-18T06:27:05.143Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://blog.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E6%25B8%2585%25E5%258D%2595/</loc>
+        <loc>https://www.lemoon.fun/categories/%25E5%25BC%2580%25E5%258F%2591/%25E6%25B8%2585%25E5%258D%2595/</loc>
         <lastmod>2019-12-18T06:16:19.439Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
